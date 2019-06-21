@@ -35,10 +35,11 @@ git add . 将工作区提交到暂存区
 git commit -m "注释"   将暂存区提交到本地仓库.git
 git config --global user.email "you@example.com" 添加邮箱信息
 git config --global user.name "Your Name"添加名字 在家目录生成~/.gitconfig
-git config --global push.default simple && git push 上传到服务器仓库
+git config --global push.default simple 第一次上传需要输入
+git push 上传到服务器仓库
 git pull 更新本地仓库,与服务器同步
 git log   查看版本日志
-git log --oneline   查看版本日志
+git log --oneline   以行为单位查看版本日志
 git reflog   查看历史版本日志
 git reset --hard 版本号   移动到选择的版本
 
