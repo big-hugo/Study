@@ -1,0 +1,5 @@
+源码包安装
+yum -y install gcc 
+tar -xf 
+./configur
+make && make install
