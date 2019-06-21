@@ -1,0 +1,31 @@
+Nginx安装
+用源码包安装 依赖包有gcc  pcre-devel  openssl-devel
+useradd -s /sbin/nologin nginx   系统新建一个非登录用户
+./configure  --user=nginx  --group=nginx 源码包检测时可添加nginx用户,默认用户为nobody,为了安全;可用--help查看可安装的模块
+/usr/local/nginx/sbin/nginx  启动程序
+/usr/local/nginx/sbin/nginx  -s stop   停止服务
+/usr/local/nginx/sbin/nginx  -s reload  重载配置
+/usr/local/nginx/sbin/nginx -v  查看版本信息
+ln -s /usr/local/nginx/sbin/nginx  /sbin   创建软连接可以快捷使用
+
+Nginx升级
+用源码包检测,编译,不安装(为了使用原来的配置文件,只更新启动软件)
+mv  /usr/local/nginx/sbin/nginx  /usr/local/nginx/sbin/nginxold  备份旧版本的启动文件
+cp  objs/ngin  /usr/local/nginx/sbin/nginx   复制为新的启动文件
+killall nginx &&  /usr/local/nginx/sbin/nginx  杀死原进程,再启动
+
+配置加密网站
+安装httpd-tools
+htpasswd -C /usr/local/nginx/pass  用户名   创建用户,路径自定自定义,去掉-C为追加用户
+vim /usr/local/nginx/conf/nginx.conf       进入配置文件
+server {  
+           listen 80;                     监听端口
+           server_name  域名;              网站域名
+           auth_basic  "xxx";              密码提示信息
+           auth_basic_user_file "/usr/local/nginx/pass";     密码信息文件路径
+    localtion / {                                 匹配URL以/结尾的条件(默认以/结尾)
+                  root html;                      页面所在目录
+                  index index.html index.htm;     匹配默认页面名,按优先级排序
+    }    
+        }
+/usr/local/nginx/sbin/nginx  -s reload        重载配置文件
