@@ -1,5 +1,6 @@
 源码包安装
 yum -y install gcc 
-tar -xf 
+tar -xf  源码包
+cd  解压后目录
 ./configur
 make && make install
