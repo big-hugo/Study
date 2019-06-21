@@ -4,3 +4,44 @@ tar -xf  源码包
 cd  解压后目录
 ./configur
 make && make install
+ 
+制作RPM包(nginx例子)  
+原理是把软件打包,并设置应答文件
+安装 rpm-build
+rpmbuild -ba xx.spec              会报错,生成~/rpmbuild目录
+cp 源码包  ~/rpmbuild/SOURCES       把源码包复制到SOURCES目录下
+vim ~/rpmbulid/SPECS/*.spec         填写里面的信息 
+Name:nginx                                        #源码包软件名称(不能乱写)
+Version:1.12.2                                    #源码包软件的版本号(不能乱写,需要对应)
+Release:    10                                   #制作的RPM包版本号(随意)
+Summary: Nginx is a web server software.            #RPM软件的概述
+Group:                                         软件所属包组
+License:GPL                                        #软件的协议(GPL可修改,可使用,可发布,开源)
+URL:    www.test.com                                    #网址
+Source0:nginx-1.12.2.tar.gz                        #源码包文件的全称(不能乱写)
+#BuildRequires:                                    #制作RPM时的依赖关系
+#Requires:                                        #安装RPM时的依赖关系
+%description   XXXXXXXXXXXXXXXXXXX            #软件的详细描述
+%post      useradd nginx                     #非必需操作：安装后脚本(创建账户),多命令可回车输入
+%prep
+%setup -q                                #自动解压源码包，并cd进入目录
+%build
+./configure        [--with-http_ssl_module ..]      可添加模块
+make %{?_smp_mflags}
+%install
+make install DESTDIR=%{buildroot}
+%files
+%doc
+/usr/local/nginx/*                    #对哪些文件与目录打包
+保存退出
+rpmbuild  -ba nginx.spec    编译安装软件 
+rpm -qpi ~/rpmbulid/RPMS/x86_64/nginx-1.12.2-10.x86_64.rpm   安装软件
+
+
+yum软件
+yum  -y install 软件包      安装软件
+yum groupinstall  软件包组  安装组包
+yum info 软件包            关于软件的描述信息
+
+rpm软件
+rpm -ivh 软件  安装软件
