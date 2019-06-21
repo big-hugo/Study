@@ -34,7 +34,7 @@ make install DESTDIR=%{buildroot}
 %doc
 /usr/local/nginx/*                    #对哪些文件与目录打包
 保存退出
-rpmbuild  -ba nginx.spec    编译安装软件 
+rpmbuild  -ba nginx.spec    编译软件 
 rpm -qpi ~/rpmbulid/RPMS/x86_64/nginx-1.12.2-10.x86_64.rpm   安装软件
 
 
