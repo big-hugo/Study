@@ -1,5 +1,5 @@
 Network Time Protocol（网络时间协议）
-一般不用修改,为了解决闰秒问题(59 60 00)
+一般不用修改,为了解决闰秒问题(59 60 00 1752年9月)
 服务端
 yum -y install chrony               安装chrony软件
 vim /etc/chrony.conf                修改配置文件
