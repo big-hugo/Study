@@ -1,0 +1,16 @@
+VPN概述
+在公共网络上建立私有网络,进行加密通讯;多用于总公司与外区联系,翻墙
+主流技术(GRE,PPTP,L2TP+IPSec,SSL)
+
+
+搭建GRE VPN环境(服务端,客户端)
+lsmod    查看系统模块
+modprobe ip_gre   加载GRE模块
+modinfo ip_gre    查看gre模块信息
+ip tunnel add tun0 mode gre remote 对方公网ip local 自身公网ip    建立隧道(tun0为隧道名)
+ip link set tun0 up   激活隧道
+ip link show          查看隧道信息
+ip addr add 10.10.10.10/24 peer 10.10.10.5/24 dev tun0     设定隧道中自身与对方ip (客户端中相反)
+ip addr show          查看隧道ip信息
+echo "1" > /proc/sys/net/ipv4/ip_forward   开启路由转发(1开启,0关闭;用于翻墙必须打开)
+关闭防火墙,现在隧道里的ip可以互相ping通
