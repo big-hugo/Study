@@ -3,7 +3,7 @@ VPN概述
 主流技术(GRE,PPTP,L2TP+IPSec,SSL)
 
 
-搭建GRE VPN环境(服务端,客户端)
+搭建GRE VPN环境(服务端,客户端,仅支持linux)
 lsmod    查看系统模块
 modprobe ip_gre   加载GRE模块
 modinfo ip_gre    查看gre模块信息
@@ -14,3 +14,29 @@ ip addr add 10.10.10.10/24 peer 10.10.10.5/24 dev tun0     设定隧道中自身
 ip addr show          查看隧道ip信息
 echo "1" > /proc/sys/net/ipv4/ip_forward   开启路由转发(1开启,0关闭;用于翻墙必须打开)
 关闭防火墙,现在隧道里的ip可以互相ping通
+
+
+创建PPTP VPN(支持与Windows)
+支持身份验证,数据加密
+linux服务器安装pptpd-1.4.0-2.el7.x86_64.rpm(yum没有需要上网找)
+ vim /etc/pptpd.conf                修改配置文件(在最后写入下面两行)
+localip 201.1.2.5                  服务器本地公网IP
+remoteip 192.168.3.1-50            分配给客户端的私有IP池,起dhcp用
+vim /etc/ppp/options.pptpd          修改配置文件
+require-mppe-128                    使用MPPE加密数据
+ms-dns 8.8.8.8                      DNS服务器
+vim /etc/ppp/chap-secrets          修改账户配置文件
+jacob    *    123456   *   (用户名   服务器名字   密码   客户端ip)
+echo "1" > /proc/sys/net/ipv4/ip_forward   开启路由转发(1开启,0关闭;用于翻墙必须打开)
+关闭防火墙,现在Windows可以用账号密码连接服务器的vpn
+
+
+
+
+
+
+
+
+rpm -qc pptpd  查看软件配置文件
+
+
