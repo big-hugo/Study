@@ -1,0 +1,18 @@
+Network Time Protocol（网络时间协议）
+一般不用修改,为了解决闰秒问题(59 60 00)
+服务端
+yum -y install chrony               安装chrony软件
+vim /etc/chrony.conf                修改配置文件
+server 192.168.5.1 iburst           与192.168.5.1的服务器同步时间(iburst尽快同步时间)
+allow   192.168.4.0/24              允许改网段来访问时间
+deny     192.168.4.5                拒绝该ip来访问时间
+local stratum 10                    设置NTP服务器的层数量
+systemctl  restart  chronyd         重启服务
+systemctl  enable  chronyd          开机自启动服务
+客户端
+date -s '2019-5-6 10:56:32'         修改系统时间
+vim /etc/chrony.conf                修改配置文件
+server 192.168.5.1 iburst           与192.168.5.1的服务器同步时间(iburst尽快同步时间)
+systemctl  restart  chronyd         重启服务
+systemctl  enable  chronyd          开机自启动服务
+date                                再次查看时间
