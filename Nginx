@@ -29,3 +29,64 @@ server {
     }    
         }
 /usr/local/nginx/sbin/nginx  -s reload        重载配置文件
+
+
+创建虚拟主机
+去掉虚拟主机的注释，修改sever_name        域名
+listen *:* ;          端口
+charset utf-8;          支持中文
+创建新的虚拟主机页面所在路径,重载配置文件生效
+
+
+部署LNMP(linux,nginx,mysql,php)
+出了nginx,还需要安装mariadb  mariadb-server  mariadb-devel  php  php-fpm  php-mysql
+修改php-fpm的配置/etc/php-fpm.d/www.conf
+listen = 127.0.0.1:9000               PHP端口号
+pm.max_children = 32                  最大进程数(每个进程约20m,看内存来分配)
+pm.start_servers = 15                 最小进程数
+pm.min_spare_servers = 5              最小需要空闲进程
+pm.max_spare_servers = 32             最多允许空间进程
+重启php-fpm服务
+php页面错误日志 /var/log/php-fpm/www-error.log
+修改nginx配置,实现动态页面
+location ~\.php$ {                    匹配以php结尾的URL
+           root html;                 网页目录
+           fastcgi_pass 127.0.0.1:9000;     转发到自身9000端口
+           fastcgi_index  index.php;        默认页面
+           include fastcgi.conf;            加载副配置文件(改后缀名)
+           }
+重载nginx配置文件
+
+
+Nginx实现地址重写
+server{
+           rewrite  旧地址  新地址   [选项];              格式
+           rewrite  /a.html  /b.html redirect;         重新网页目录下的网页
+           rewrite  /   http://www.tmooc.cn/ ;         重写域名
+           rewrite  ^/(.*)$  http://www.tmooc.cn/$1;   重新到其他域名下相同URI
+ 选项: redirect地址栏显示新地址  last不再读其他rewrite  break不再读其他语句 permanent永久重定向
+           }
+           
+           
+ 配置SSL安全网站
+ cd usr/local/nginx/conf         进入配置文件目录
+ openssl genrsa > cert.key                  生成私钥
+ openssl req -new -x509 -key cert.key > cert.pem       生成证书
+ 进入配置文件 /usr/local/nginx/conf/nginx.conf
+ 去掉SSL段的注释(这里的私钥和证书名要与生成的一致)
+修改域名,页面地址,重载服务
+
+
+实现不同浏览器访问不同页面
+server{  ...                                           写在虚拟主机里
+        if ($http_user_agent  ~*  firefox) {           模糊匹配firefox浏览器
+           rewrite  /(.*)  /firefox/$1;                任何URI重写到firefox目录下的相同URI
+        }  
+}
+
+
+
+
+
+
+
