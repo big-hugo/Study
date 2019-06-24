@@ -54,7 +54,7 @@ ipvsadm-save -n > /etc/sysconfig/ipvsadm     保存配置(默认重启会清空)
 调度器
 echo 1 > /proc/sys/net/ipv4/ip_forward   开启路由功能(临时)
 echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf     开启路由功能(永久) 
-ipvsadm -A -t 192.168.4.5:80 -s wrr                新建虚拟服务器,用wrr算法
+ipvsadm -A -t 192.168.4.5:80 -s ++rr                新建虚拟服务器,用rr算法
 ipvsadm -a -t 192.168.4.5:80 -r 192.168.2.100 -m    添加真实服务器,用NAT模式
 ipvsadm -a -t 192.168.4.5:80 -r 192.168.2.200 -m    添加真实服务器,用NAT模式
 ipvsadm -Ln                                         查看集群表
