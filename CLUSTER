@@ -1,0 +1,65 @@
+集群目的(任务调度是技术核心)
+提高性能
+降低成本
+提高扩展性
+增强可靠性
+
+集群分类
+高性能计算集群HPC
+负载均衡(LB)集群
+高可用(HA)集群
+
+LVS内核自带,原理是路由转发(ip_forward=1)+调度
+LVS工作模式
+NAT模式:缺点,服务器返回数据量多
+DR模式:直连路由,真实服务器直接返回给用户
+TUN模式:tunnel(隧道),少用
+
+LVS集群
+前端:负载均衡层
+中间:服务器群组层
+底端:数据共享存储层
+
+LVS术语
+Diretcor Server 调度服务器
+Real Server  真实服务器
+VIP  虚拟IP地址,公布给用户的虚拟ip地址
+RIP  真实IP地址,集群节点上使用的IP地址
+DIP  调度器连接节点服务器的IP
+
+LVS算法(10种,常用以下6种)
+轮询round robin(rr)
+加权轮询weighted round robin(wrr)
+最少连接least connection(lc)
+加权最少连接weighted least connection(wlc)
+原地址哈希source hash(sh)
+目标地址哈希(dh)
+
+ipvsadm  调用LVS的软件
+yum -y install ipvsadm
+选项:-A  添加虚拟服务器    -E  修改虚拟服务器  -D  删除虚拟服务器  -C  清空所有   -Ln  查看LVS规则表
+-a 添加真实服务器   -e 修改真实服务器   -d 删除真实服务器  -s [rr|wrr|lc|wlc]  指定集群算法  -w 权重 
+-t或-u  用tcp或udp协议 -r 真实服务器   -g DR直连模式    -i 隧道模式    -m NAT模式
+ipvsadm -A -t 192.168.4.5:80      添加一个虚拟服务器
+ipvsadm -a -t 192.168.4.5:80 -r  192.168.2.10:25   在虚拟服务器下添加一个真实服务器
+ipvsadm -a -t 192.168.4.5:80 -r  192.168.2.10:25 -m -w 3   添加一个NAT模式.权重3的真实服务器
+ipvsadm-save -n > /etc/sysconfig/ipvsadm     保存配置(默认重启会清空)
+
+
+部署LVS-NAT集群
+调度器
+echo 1 > /proc/sys/net/ipv4/ip_forward   开启路由功能(临时)
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf     开启路由功能(永久) ipvsadm -A -t 192.168.4.5:80 -s wrr
+ipvsadm -A -t 192.168.4.5:80 -s wrr                新建虚拟服务器,用wrr算法
+ipvsadm -a -t 192.168.4.5:80 -r 192.168.2.100 -m    添加真实服务器,用NAT模式
+ipvsadm -a -t 192.168.4.5:80 -r 192.168.2.200 -m    添加真实服务器,用NAT模式
+ipvsadm -Ln                                         查看集群表
+服务器
+网关要设置成调度器的ip
+关闭防火墙,selinux
+
+
+
+
+
+
