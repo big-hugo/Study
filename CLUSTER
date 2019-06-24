@@ -10,6 +10,10 @@
 高可用(HA)集群
 
 LVS内核自带,原理是路由转发(ip_forward=1)+调度
+效率 LVS>haproxy>nginx
+功能 nginx>haproxy>LVS
+效率高,工作在四层tcp,udp,不带健康检查,功能简单(转发)
+
 LVS工作模式
 NAT模式:缺点,服务器返回数据量多
 DR模式:直连路由,真实服务器直接返回给用户
@@ -49,14 +53,86 @@ ipvsadm-save -n > /etc/sysconfig/ipvsadm     保存配置(默认重启会清空)
 部署LVS-NAT集群
 调度器
 echo 1 > /proc/sys/net/ipv4/ip_forward   开启路由功能(临时)
-echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf     开启路由功能(永久) ipvsadm -A -t 192.168.4.5:80 -s wrr
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf     开启路由功能(永久) 
 ipvsadm -A -t 192.168.4.5:80 -s wrr                新建虚拟服务器,用wrr算法
 ipvsadm -a -t 192.168.4.5:80 -r 192.168.2.100 -m    添加真实服务器,用NAT模式
 ipvsadm -a -t 192.168.4.5:80 -r 192.168.2.200 -m    添加真实服务器,用NAT模式
 ipvsadm -Ln                                         查看集群表
-服务器
+后端服务器
 网关要设置成调度器的ip
 关闭防火墙,selinux
+
+
+部署LVS-DR集群   
+VIP是对客户端提供服务的IP地址；
+RIP是后端服务器的真实IP地址；
+DIP是调度器与后端服务器通信的IP地址（VIP必须配置在虚拟接口）
+调度器
+cd /etc/sysconfig/network-scripts/             进入网卡配置文件目录
+cp ifcfg-eth0  ifcfg-eth0:0                    复制网卡配置文件作为VIP
+vim ifcfg-eth0:0                               修改配置文件,其他没用可以删掉
+TYPE=Ethernet
+BOOTPROTO=none
+NAME=eth0:0
+DEVICE=eth0:0
+ONBOOT=yes
+IPADDR=192.168.4.15                            输入VIP
+PREFIX=24
+systemctl stop  NetworkManager                 关闭网络管理器(这两个服务会抢着管理,要关掉一个)
+systemctl restart network                      重启网络服务
+ipvsadm -A -t 192.168.4.15:80 -s rr                 新建虚拟服务器
+ipvsadm -a -t 192.168.4.15:80 -r 192.168.4.100 -g   添加真实服务器,用DR模式,用DIP
+ipvsadm -a -t 192.168.4.15:80 -r 192.168.4.200 -g   
+后端服务器
+cd /etc/sysconfig/network-scripts/             进入网卡配置文件目录
+cp ifcfg-lo ifcfg-lo:0                         复制网卡配置文件作为VIP
+vim ifcfg-lo:0                                 修改配置文件,其他没用可以删掉
+DEVICE=lo:0
+IPADDR=192.168.4.15                            输入VIP
+NETMASK=255.255.255.255                        
+NETWORK=192.168.4.15
+BROADCAST=192.168.4.15
+ONBOOT=yes
+NAME=lo:0
+vim /etc/sysctl.conf                          修改配置文件,防止地址冲突
+net.ipv4.conf.all.arp_ignore = 1              当有arp广播问谁是192.168.4.15时，本机忽略该ARP广播，不做任何回应(默认0)
+net.ipv4.conf.lo.arp_ignore = 1               
+net.ipv4.conf.lo.arp_announce = 2             本机不要向外宣告自己的lo回环地址是192.168.4.15(默认值为0,1尽量不宣告)
+net.ipv4.conf.all.arp_announce = 2
+sysctl -p                                     刷新配置文件
+systemctl stop  NetworkManager                关闭网络管理器(这两个服务会抢着管理,要关掉一个)
+systemctl restart network                     重启网络服务
+
+
+动态检测后端服务器是否能访问脚本(LVS不自带健康检查)
+#!/bin/bash
+VIP=192.168.4.15:80
+RIP1=192.168.4.100
+RIP2=192.168.4.200
+while :
+do
+   for IP in $RIP1 $RIP2
+   do
+           curl -s http://$IP &>/dev/vnull
+if [ $? -eq 0 ];then
+            ipvsadm -Ln |grep -q $IP || ipvsadm -a -t $VIP -r $IP
+        else
+             ipvsadm -Ln |grep -q $IP && ipvsadm -d -t $VIP -r $IP
+        fi
+   done
+sleep 1
+done
+
+
+
+
+
+
+
+
+
+
+
 
 
 
