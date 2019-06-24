@@ -85,6 +85,73 @@ server{  ...                                           写在虚拟主机里
 }
 
 
+Nginx七层调度器(反向代理)
+功能:轮询调度,健康检查
+vim     /usr/local/nginx/conf/nginx.conf    配置文件
+http{ ...  upstream  name {                 定义后端集群,名称可自定义    
+           server 后端服务器ip:80;              添加后端服务器
+           server 后端服务器2ip:80  weight=2  max_fails=1  fail_timeout=30;   权重,最大失败次数,失败后30秒后再检查
+}}
+server {    ...
+           location / {
+                           ip_hash;                         实现同一来源ip访问同一服务器            
+                           proxy_pass  http:// name:        转发给集群 
+           }
+}
+
+
+Nginx四层(TCP/UDP)调度器
+nginx1.9版本后可用,可用于ssh转发
+./configure  --with-stream                 检查源码包时添加--with-stream模块
+vim  /usr/lcoal/nginx/conf/nginx.conf      修改配置文件
+stream {    upstream name {                定义集群,名称任意(stream在http外) 
+           server 后端服务器ip:端口;          添加后端服务器
+           server 后端服务器ip2:端口;
+ }
+server {     listen *;                      监听端口
+          proxy_pass  name;                 转发给集群
+} 
+}http{ ... }
+
+
+自定义报错页面  
+error_page  404  /404.html;      提前准备404.html
+401 账户密码错误    403 禁止访问    404 找不到页面   414  url头部过长     502  bad gateway
+
+
+Nginx查看状态信息
+./configure  --with-http_sub_status_module   检查时添加状态模块
+server { ... location /status {              匹配url的结尾为status
+              stub_status on;                开启状态页面
+              allow    ip;                  允许访问ip
+              deny    all;                   不允许全部人访问
+}}
+状态页面信息
+Active connections: 1                       当前连接数量
+server accepts handled requests             
+ 1 1 1                                      已接受总数量  已处理总数量   客户端发送请求数量
+Reading: 0 Writing: 1 Waiting: 0            正在读取数量  正在响应数量   正在等待响应数量
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
