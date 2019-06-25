@@ -122,15 +122,41 @@ systemctl stop  NetworkManager                关闭网络管理器(这两个服
 systemctl restart network                     重启网络服务
 
 
-
-
-
-
-
-
-
-
-
+同时服务于 LVS-DR，又要做为数据库的后端。所以我们要注意，只接收一个 director 的数据包。
+这时我们在 Director1 中设置($MAC_Director2 是指我在 Director1 上所能见到从 Director2 发过来包的 MAC 地址) :
+iptables  -t mangle -I PREROUTING -d $VIP -p tcp -m tcp --dport $VPORT -m mac ! --mac-source $MAC_Director2 -j MARK --set-mark 0x3
+并在备份的 keepalived 的服务器 Director2 中设置:
+iptables  -t mangle -I PREROUTING -d $VIP -p tcp -m tcp --dport $VPORT -m mac ! --mac-source $MAC_Director1 -j MARK --set-mark 0x4
+$VIP 为VIP地址
+$VPORT 为服务端口
+$MAC_Director1 是主 的MAC (keepalived 之间互相监听的那块网卡)
+$MAC_Director2 是备机的MAC (keepalived 之间互相监听的那块网卡)
+iptables -t mangle --lis            查看添加的规则是否生效
+service iptables save               保存iptables规则
+service iptables restart            重启iptables服务
+cat /etc/sysconfig/iptables         查看当前规则
+接着在 keepalived 中分别配置这二个
+virtual_server fwmark 3  {  # 另一台备库是fwmark 4
+    delay_loop 10
+    lb_algo rr
+    lb_kind DR
+    protocol TCP
+    real_server 192.168.1.213 3306 {
+    weight 1
+    MISC_CHECK {
+        misc_path &quot;/etc/keepalived/check_slave.pl 192.168.1.213&quot;
+        misc_dynamic
+    }
+    }
+    real_server 192.168.1.233 3306 {
+    weight 1
+    MISC_CHECK {
+        misc_path &quot;/etc/keepalived/check_slave.pl 192.168.1.233&quot;
+        misc_dynamic
+        }
+    }
+}
+详情请看https://blog.csdn.net/wzyzzu/article/details/47277533
 
 
 
