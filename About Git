@@ -6,7 +6,7 @@
 yum安装git
 新建一个目录 /var/git  
 新建空仓库git init /var/git/project --bare
-初始化空的 Git 版本库于 /var/git/project/.git/
+初始化空的Git版本库在 /var/git/project/.git/
 
 服务端配置(git版)
 安装git-daemon  git 
@@ -18,7 +18,7 @@ systemctl start git.socket  起服务
 服务端配置(web版)
 安装gitweb  httpd  git
 vim +11 /etc/gitweb.conf 直接跳到11行
-$project="仓库目录";
+$projectroot="仓库目录";      输入git所在目录
 重启httpd  客户端可用firefox 服务器ip/git 访问
 
 客户端克隆git仓库,作为工作目录,仅第一次使用
@@ -26,6 +26,7 @@ ssh-keygen -f /root/.ssh/id_rsa -N ''  非交互生成秘钥(git通用)
 ssh-copy-id  服务器ip        发送秘钥到服务器,实现免密登录
 git  clone  *@服务器IP:仓库目录  克隆服务器上的仓库,作为工作目录(基于ssh)
 git clone git://服务器ip/服务器git仓库   克隆git仓库(基于git)
+firefox http://192.168.2.100/git/     访问git仓库(基于web)
 
 
 客户端:
