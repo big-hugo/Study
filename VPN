@@ -64,11 +64,11 @@ vim  /etc/xl2tpd/xl2tpd.conf            修改配置文件
 ip range = 192.168.3.128-192.168.3.254     修改隧道ip地址池
 local ip = 201.1.2.10                      自身公网ip
 vim /etc/ppp/options.xl2tpd                修改配置文件
-require-mschap-v2                          取消注释这一行
 #crtscts                                   注释或删除该行
 #lock                                      注释或删除该行
+require-mschap-v2                          取消注释这一行
 vim /etc/ppp/chap-secrets                  修改账户配置文件
-jacob    *    123456   *   (用户名   服务器名字   密码   客户端ip)
+jacob    *    123456   *    用户名   服务器名字(任何)   密码   客户端ip(任何)
 systemctl restart xl2tpd.service       启动xl2tpd服务(1701端口)
 echo "1" > /proc/sys/net/ipv4/ip_forward   开启路由转发(1开启,0关闭;用于翻墙必须打开)
 iptables -t nat -A POSTROUTING -s 192.168.3.0/24 >  -j SNAT --to-source 201.1.2.5    出公网设置,翻墙必要操作
