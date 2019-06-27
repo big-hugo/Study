@@ -10,7 +10,7 @@ Ceph
 
 
 部署ceph集群
-node1主机
+node1主机(创建MON)
 事先准备好对其他机的免钥连接,/etc/hosts域名解析能识别其他主机,/etc/chrony时间同步以node1为主,yum正常使用
 yum -y install ceph-deploy            安装软件
 mkdir ceph-cluster                    新建一个自定义名字的目录(ceph相关操作全在里面)
@@ -22,7 +22,7 @@ do
 done 
 ceph-deploy mon create-initial       初始化所有节点的mon服务，也就是启动mon服务（主机名解析必须对）
 ceph -s           查看状态(HEALTH_ERR为错误)
-创建OSD(缓存盘)
+创建OSD
      for i in node1 node2 node3                vdb1和vdb2这两个分区用来做存储服务器的journal缓存盘
 do
      ssh $i "parted /dev/vdb mklabel gpt"
@@ -34,11 +34,11 @@ do
 > ssh $i "chown ceph:ceph /dev/vdb1"        此配置为临时权限,重启不生效
 > ssh $i "chown ceph:ceph /dev/vdb2"
 > done
-vim /etc/udev/rules.d/70-vdb.rules         永久配置设备权限(此文件为新建文件)
+vim /etc/udev/rules.d/70-vdb.rules         永久配置设备权限(*.rules文件)
 ENV{DEVNAME}=="/dev/vdb1",OWNER="ceph",GROUP="ceph"
 ENV{DEVNAME}=="/dev/vdb2",OWNER="ceph",GROUP="ceph"
 初始化清空磁盘数据（仅node1操作即可）
- ceph-deploy disk  zap  node1:vdc   node1:vdd    
+ ceph-deploy disk  zap  node1:vdc   node1:vdd    vdv,vdd为磁盘名
  ceph-deploy disk  zap  node2:vdc   node2:vdd
  ceph-deploy disk  zap  node3:vdc   node3:vdd  
 创建OSD存储空间（仅node1操作即可）
