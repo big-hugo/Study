@@ -51,6 +51,7 @@ ceph -s           查看状态(HEALTH_OK为正确)
 ceph osd lspools                    查看存储池
 rbd create demo-image --image-feature  layering --size 10G    创建镜像  #这里的demo-image和image(默认前面有rbd,不打也可以)为创建的镜像名称，可以为任意字符。
 rbd create rbd/image --image-feature  layering --size 10G     创建镜像   #--image-feature参数指定我们创建的镜像有哪些功能，layering是开启COW功能
+rbd rm image                    删除镜像
 rbd list                        查看现有镜像名字
 rbd info 镜像名                  查看镜像详细信息
 rbd resize --size 7G 镜像名 --allow-shrink     缩小容量(慎重操作)allow-shrink为允许缩小
@@ -58,8 +59,8 @@ rbd resize --size 15G 镜像名                   增加容量
 scp ceph.client.admin.keyring   client:/etc/ecph  发送秘钥给客户端
 客户端通过KRBD访问
 yum -y  install ceph-common               安装软件
- scp 192.168.4.11:/etc/ceph/ceph.conf  /etc/ceph/         接收密码信息
- scp 192.168.4.11:/etc/ceph/ceph.client.admin.keyring  /etc/ceph/     接收秘钥
+ scp 192.168.4.11:/etc/ceph/ceph.conf  /etc/ceph/         拷贝配置文件(否则不知道集群在哪)
+ scp 192.168.4.11:/etc/ceph/ceph.client.admin.keyring  /etc/ceph/     接收秘钥(否则无权限连接)
  rbd map 镜像名         获取镜像盘( 客户端可以格式化,挂载使用获得的镜像盘)
  rbd unmap /dev/rbd0   取消镜像映射
  lsblk                 查看磁盘分区
@@ -70,7 +71,7 @@ yum -y  install ceph-common               安装软件
 创建快照克隆
  rbd snap protect image --snap image-snap1   保护image镜像的image-snap1快照
  rbd snap rm image --snap image-snap1        删除image镜像的image-snap1快照(被保护会删除失败)
- rbd clone image --snap image-snap1 image-clone --image-feature layering  /使用image的快照image-snap1克隆一个新的名称为image-clone镜像
+ rbd clone image --snap image-snap1 image-clone --image-feature layering  /使用image的快照image-snap1克隆一个新的名称为image-clone镜像(需要先对快照进行保护操作)
  rbd info image-clone        查看镜像信息,可以看到parent有父快照
  rbd flatten image-clone     拷贝父快照,如果希望克隆镜像可以独立工作，就需要将父快照中的数据，全部拷贝一份，但比较耗时    
  rbd snap unprotect image --snap image-snap1     #取消快照保护
