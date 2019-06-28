@@ -7,10 +7,11 @@ SDS分布式存储(软件定义存储)
 Ceph
 分布式文件系统,具有高扩展,高可用,高性能的特点
 要求集群之间时间误差0.05ms
+组件:MON集群监控组件,OSD存储设备,MDS存放文件系统的元数据,RGW对象存储网关,clinet客户端
 
 
 部署ceph集群
-node1主机(创建MON)
+node1主机(创建MON,至少一半以上的MON正常才能使用)
 事先准备好对其他机的免钥连接,/etc/hosts域名解析能识别其他主机,/etc/chrony时间同步以node1为主,yum正常使用
 yum -y install ceph-deploy            安装软件
 mkdir ceph-cluster                    新建一个自定义名字的目录(ceph相关操作全在里面)
@@ -27,14 +28,11 @@ ceph -s           查看状态(HEALTH_ERR为错误)
 do
      ssh $i "parted /dev/vdb mklabel gpt"
      ssh $i "parted /dev/vdb mkpart primary 1 50%"
-     ssh $i "parted /dev/vdb mkpart primary 50% 100%"
+     ssh $i "parted /dev/vdb mkpart primary 50% 100%"                 
+     ssh $i "chown ceph:ceph /dev/vdb1"        此配置为临时权限,重启不生效
+     ssh $i "chown ceph:ceph /dev/vdb2"       磁盘分区后的默认权限无法让ceph软件对其进行读写操作，需要修改权限。node1、node2、node3都需要操作，这里以node1为例
  done
-    for i in node1 node2 node3             磁盘分区后的默认权限无法让ceph软件对其进行读写操作，需要修改权限。node1、node2、node3都需要操作，这里以node1为例。         
-> do
-> ssh $i "chown ceph:ceph /dev/vdb1"        此配置为临时权限,重启不生效
-> ssh $i "chown ceph:ceph /dev/vdb2"
-> done
-vim /etc/udev/rules.d/70-vdb.rules         永久配置设备权限(*.rules文件)
+vim /etc/udev/rules.d/70-vdb.rules         永久配置设备权限(*.rules文件),发送给其他mon
 ENV{DEVNAME}=="/dev/vdb1",OWNER="ceph",GROUP="ceph"
 ENV{DEVNAME}=="/dev/vdb2",OWNER="ceph",GROUP="ceph"
 初始化清空磁盘数据（仅node1操作即可）
@@ -48,7 +46,7 @@ ceph-deploy osd create  node3:vdc:/dev/vdb1 node3:vdd:/dev/vdb2
 ceph -s           查看状态(HEALTH_OK为正确)
 
 
-创建Ceph块存储
+创建Ceph块存储(OSD)
 在node1上操作
 ceph osd lspools                    查看存储池
 rbd create demo-image --image-feature  layering --size 10G    创建镜像  #这里的demo-image和image(默认前面有rbd,不打也可以)为创建的镜像名称，可以为任意字符。
@@ -60,14 +58,51 @@ rbd resize --size 15G 镜像名                   增加容量
 scp ceph.client.admin.keyring   client:/etc/ecph  发送秘钥给客户端
 客户端通过KRBD访问
 yum -y  install ceph-common               安装软件
- scp 192.168.4.11:/etc/ceph/ceph.conf  /etc/ceph/         接收秘钥
- scp 192.168.4.11:/etc/ceph/ceph.client.admin.keyring  /etc/ceph/     接收 秘钥
- rbd map 镜像名         获取镜像盘`
+ scp 192.168.4.11:/etc/ceph/ceph.conf  /etc/ceph/         接收密码信息
+ scp 192.168.4.11:/etc/ceph/ceph.client.admin.keyring  /etc/ceph/     接收秘钥
+ rbd map 镜像名         获取镜像盘( 客户端可以格式化,挂载使用获得的镜像盘)
+ rbd unmap /dev/rbd0   取消镜像映射
  lsblk                 查看磁盘分区
  rbd showmapped                           查看镜像
+ rbd snap ls 镜像名                        查看镜像快照
+ rbd snap create image --snap image-snap1    为image镜像创建快照，快照名称为image-snap1
+ rbd snap rollback image --snap image-snap    还原快照(先取消挂载umount,重新挂载后删除的文件可以恢复)
+创建快照克隆
+ rbd snap protect image --snap image-snap1   保护image镜像的image-snap1快照
+ rbd snap rm image --snap image-snap1        删除image镜像的image-snap1快照(被保护会删除失败)
+ rbd clone image --snap image-snap1 image-clone --image-feature layering  /使用image的快照image-snap1克隆一个新的名称为image-clone镜像
+ rbd info image-clone        查看镜像信息,可以看到parent有父快照
+ rbd flatten image-clone     拷贝父快照,如果希望克隆镜像可以独立工作，就需要将父快照中的数据，全部拷贝一份，但比较耗时    
+ rbd snap unprotect image --snap image-snap1     #取消快照保护
+
+创建Ceph文件系统存储(MDS)
+部署MDSs节点,创建Ceph文件系统,客户端可以直接挂载文件系统
+文件系统分为        inode(256)                                block(4k)
+                 元数据(metedata)描述数据                     数据
+ceph-deploy mds create node3           /在node1上的ceph目录操作,给nod3拷贝配置文件，启动mds服务
+ceph mds stat                         //查看mds状态
+ceph osd pool create cephfs_data 128    创建存储池，对应128个PG指引(2的幂方,cephfs_data为自定义名字,作block用)
+ ceph osd pool create cephfs_metadata 128  创建储存池,作inode用
+ceph fs new myfs1 cephfs_metadata cephfs_data    创建文件系统,myfs1为自定义文件系统名字,先写inode池，再写block池,只能创建1个文件系统，多余的会报错
+ ceph fs ls                              查看文件格式
+客户端挂载
+ mount -t ceph 192.168.4.11:6789:/  /mnt/cephfs/  -o name=admin,secret=AQBTsdRapUxBKRAANXtteNUyoEmQHveb75bISg==   挂载文件系统,IP为node1的,6789为mds默认端口,在node1的ceph.client.admin.keyring里获取信息
+
+创建对象存储(RADOSGW)
+ceph-deploy rgw create node3         在node1上的ceph目录操作,给nod3拷贝配置文件，启动radosgw服务
+vim  /etc/ceph/ceph.conf             可以在开启radosgw的机子上修改默认端口,在配置文件下添加三行
+[client.rgw.node3]
+host = node3
+rgw_frontends = "civetweb port=8000"      //civetweb是RGW内置的一个web服务
 
 
-
+操作概述
+ceph-deploy new  node1 node2 node3                 部署集群
+ceph-deploy mon create-initial                     创建mon显示器
+ceph-deploy osd create  node1 node2 node3          创建OSD块存储
+ceph-deploy   mds create  node3                    创建MDS文件系统存储
+ceph-deploy   rgw create  node3                    创建radosgw对象存储
+详情参考http://docs.ceph.org.cn/
 
 
 ceph-deploy mon create-initial常见错误及解决方法（非必要操作，有错误可以参考）：
@@ -80,13 +115,22 @@ public_network = 192.168.4.0/24
 修改后重新推送配置文件:
 [root@node1 ceph-cluster]# ceph-deploy --overwrite-conf config push node1 node2 node3
 
-
 如果查看状态包含如下信息：
 health: HEALTH_WARN
         clock skew detected on  node2, node3…  
 clock skew表示时间不同步，解决办法：请先将所有主机的时间都使用NTP时间同步！！！
 Ceph要求所有主机时差不能超过0.05s，否则就会提示WARN，如果使用NTP还不能精确同步时间，可以手动修改所有主机的ceph.conf，在[MON]下面添加如下一行：
 mon clock drift allowed = 1
-如果状态还是失败，可以尝试执行如下命令，重启ceph服务：
+如果状态还是失败，可以尝试在失败的节点执行如下命令，重启ceph服务：
 [root@node1 ~]#  systemctl restart ceph\*.service ceph\*.target
+
+osd create创建OSD存储空间,如提示run 'gatherkeys'
+ceph-deploy gatherkeys 
+
+
+
+
+
+
+
 
