@@ -1,0 +1,63 @@
+常见服务器品牌包括：IBM服务器、Dell服务器、HP服务器、浪潮服务器、华为服务器。
+服务器分为塔式服务器、机架式服务器、刀片服务器
+
+
+服务器硬件组成
+1）CPU
+英特尔：酷睿八代（i3,i5,i7,i9），酷睿九代(i3,i5,i7,i9)
+至强E（标准版），至强W（高功耗版）
+奔腾处理器
+AMD：	家用版（锐龙、速龙）
+服务器版本（皓龙、霄龙）
+2) 内存
+常见品牌：金士顿、三星
+家用普通内存不具有数据校验功能
+服务器配置带ECC数据校验功能的内存条
+规格：DDR1、DDR2、DDR3、DDR4、DDR5
+3）硬盘
+常见品牌：三星、英特尔、希捷、西部数据
+家用磁盘接口：SATA
+服务器磁盘接口：SAS
+SSD固态硬盘
+大小：2.5寸、3.5寸
+4）远程管理设备
+Dell：	iDRAC
+HP：	iLO
+IBM： Tivoli/ˈtɪvəli/
+
+配置服务器硬件RAID
+服务器开机后根据提示快速按Ctrl+R组合键即可进入RAID配置界面
+Ctrl+N进入下一页菜单，Ctrl+P进入上一页菜单，通过F2可以进入配置菜单
+正式配置RAID之前可以使用Clear Config清空所有配置，然后选择Create New VD创建新的RADID磁盘阵列
+在RAID Level中选择RAID级别，如RAID5（最少需要三块磁盘），并在右侧Physical Disks中选择使用哪些物理磁盘组合RAID
+点击Advanced高级
+在高级属性中开启磁盘缓存，默认未unchanged，需要设置为enable，并可以设置缓存策略：Write Through直写和Write Back回写，write through模式时数据同时被写入缓存和磁盘，安全，但是写入速度慢，write back模式时数据先写入缓存，再写入磁盘，写入速度快，但数据写入缓存时突发断电会导致数据丢
+创建完RADID后还需要初始化磁盘,新盘用fast init,旧盘用start init会比较慢
+RAID故障恢复
+将损坏的磁盘拔掉，替换一块新的磁盘即可，注意需要将新磁盘插入损坏的磁盘相同接口。磁盘大小、品牌尽可能一致。恢复数据时界面会提示Rebuild(raid5想要允许两块损坏,需要配置hot spares)
+配置Hot Space磁盘
+热备磁盘是提前准备一块备用的磁盘（当前并不使用），当RAID磁盘阵列出现损坏后，系统自动使用该热备磁盘，替代损坏的磁盘，从而不需要人工插拔磁盘即可自动修复。
+创建新的RAID磁盘阵列时，不要使用完所有磁盘，留一块磁盘做热备磁盘，点击Advanced高级选项即可配置热备磁盘,勾选Configure Hot Space配置热备磁盘
+
+Dell服务器iDRAC远程管理配置
+iDRAC需要授权使用，有授权的情况下可以直接通过浏览器访问：http://服务器IP，远程管理服务器，没有授权的情况下可以通过端口重定向将服务器上的显示内容重定向到远程管理端的电脑上（一般是用自己的笔记本远程服务器），这种方式不需要授权
+配置端口重定向,开启服务器后根据提示快速按F2键进入BIOS界面
+进入BIOS Settings后，选择Serial Communication菜单,将控制台重定向到com2，设置Serial Device=com1，Serial Device=com2
+进入iDRAC Setting界面选择Rest iDRAC configuration to defaults初始化清空iDRAC设置
+进入iDRAC Setting界面选择network,选择网卡并配置IP地址，网段需要根据实际情况自行配置
+开启IPMI智能平台管理接口（配置后可以通过命令行管理服务器），客户端安装ipmitool软件包
+进入iDRAC Setting界面选择User Configuration配置远程管理账户,配置账户名称root，并设置密码
+
+
+远程管理端主机配置，安装ipmitool软件包
+yum -y install ipmitool
+常用命令操作列表如下
+ipmitool -I lanplus -U root -H 服务器IP  power status       #查看服务器电源状态
+ ipmitool -I lanplus -U root -H 服务器IP  power on         #开启服务器电源
+ ipmitool -I lanplus -U root -H 服务器IP  power off        #关闭服务器电源
+ipmitool -I lanplus -U root -H 服务器IP  power reset       #重启服务器电源
+ipmitool -I lanplus -U root -H 服务器IP  sol activate      #远程管理
+
+
+
+
