@@ -7,6 +7,8 @@ useradd -s /sbin/nologin nginx   系统新建一个非登录用户
 /usr/local/nginx/sbin/nginx  -s reload  重载配置
 /usr/local/nginx/sbin/nginx -v  查看版本信息
 ln -s /usr/local/nginx/sbin/nginx  /sbin   创建软连接可以快捷使用
+echo "/usr/local/nginx/sbin/nginx" >> /etc/rc.local   设定开机自启的命令 
+chmod +x /etc/rc.local 确保有执行权限
 
 Nginx升级
 用源码包检测,编译,不安装(为了使用原来的配置文件,只更新启动软件)
@@ -39,7 +41,10 @@ charset utf-8;          支持中文
 
 
 部署LNMP(linux,nginx,mysql,php)
-出了nginx,还需要安装mariadb  mariadb-server  mariadb-devel  php  php-fpm  php-mysql
+除了nginx,还需要安装mariadb  mariadb-server  mariadb-devel  php  php-fpm  php-mysql
+启动服务php-fpm,mariadb并设置开机自启
+由于php页面需要调用文件夹,所以要在php页面文件夹给apache权限
+为网站提前创建一个数据库、添加账户并设置该账户有数据库访问权限
 修改php-fpm的配置/etc/php-fpm.d/www.conf
 listen = 127.0.0.1:9000               PHP端口号
 pm.max_children = 32                  最大进程数(每个进程约20m,看内存来分配)
