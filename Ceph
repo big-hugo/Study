@@ -65,10 +65,11 @@ yum -y  install ceph-common               安装软件
  rbd unmap /dev/rbd0   取消镜像映射
  lsblk                 查看磁盘分区
  rbd showmapped                           查看镜像
+
+创建快照克隆
  rbd snap ls 镜像名                        查看镜像快照
  rbd snap create image --snap image-snap1    为image镜像创建快照，快照名称为image-snap1
  rbd snap rollback image --snap image-snap    还原快照(先取消挂载umount,重新挂载后删除的文件可以恢复)
-创建快照克隆
  rbd snap protect image --snap image-snap1   保护image镜像的image-snap1快照
  rbd snap rm image --snap image-snap1        删除image镜像的image-snap1快照(被保护会删除失败)
  rbd clone image --snap image-snap1 image-clone --image-feature layering  /使用image的快照image-snap1克隆一个新的名称为image-clone镜像(需要先对快照进行保护操作)
