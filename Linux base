@@ -1,2 +1,3 @@
 cal  1752    查看年历
 route -n      查看路由表
+echo "/usr/local/nginx/sbin/nginx" >> /etc/rc.local   设定开机自启的命令
