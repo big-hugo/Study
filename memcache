@@ -1,0 +1,40 @@
+session与cookie
+用户登录成功后,服务器会创建一个session文件在/var/lib/php下记载用户状态
+客户端会被返回一个cookie在浏览器中,下次免钥登录
+
+memcache 数据库 (key-value数据库)
+可以把session存在调度器的memcache中,每次到库中去验证,免去多次登录
+memcache装在内存,重启会清除数据    默认端口11211
+安装包memcached
+调度器配置文件 /etc/sysconfig/memcache
+PORT="11211"                  默认端口  
+USER="memcached"              使用用户,安装后会创建此用户
+MAXCONN="1024"                同时可连1024人
+CACHESIZE="64"                最多缓存64M数据
+OPTIONS=""
+重启memcached服务
+
+php实现session共享   
+安装php-pecl-memcache
+修改服务器配置文件 /etc/php-fpm.d/www.conf
+最后两行   =memcache
+          ="tcp://调度器IP:11211"
+重启php-fpm服务
+
+memcache的使用
+安装telnet
+telnet  调度器IP   端口       连接数据库
+使用命令有:      set新建(也可以覆盖)    add新建    delete删除
+get读取    append追加     flush_all清除所有   replace替换  quit退出
+格式:     命令  变量名   是否压缩    缓存时间(秒)     字节数
+         set   *        0/1       180             3
+         get   *
+       delete  *
+
+
+
+
+
+
+
+
