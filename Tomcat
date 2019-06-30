@@ -1,0 +1,37 @@
+tomcat 
+适用于Java网页的服务器软件,本身也是用Java写的
+tomcat没有端口与虚拟主机绑定的机制,默认端口都是8080
+安装java-1.8.0-openjdk和java-1.8.0-openjdk-headless
+解压apache-tomcat-6.0.30.tar.gz后,目录移动到/usr/local/tomcat下即可使用,无需安装
+bin主程序目录  lib库文件 logs日志  temp临时  work自动编译 conf配置 webapps页面目录
+/usr/local/tomcat/bin/startup.sh或shutdown.sh    开关软件
+如果启动不了
+mv /dev/random /dev/random.bak     备份
+ln -s  /dev/urandom  /dev/random    生成新的内存随机码
+
+tomcat配置文件 /usr/local/tomcat/conf/server.xml
+<Host name="域名"  appBase="网站目录名"  unpackWARS="true"自动解压  autoDeploy="ture"自动部署></Host>
+复制<Host>段修改内容可生成虚拟主机
+
+网页跳转  把以test结尾的url跳转到其他路径下的网页
+<Host...><Context path="/test"  docBase="/var/www/html">
+
+tomcat部署ssl加密网站
+keytool -genkeypair -alias tomcat -keyalg RSA -keystore /usr/local/tomcat/keystore  生成私钥和证书
+配置文件<Connector port="8443"...  keystoreFile="/usr/local/tomcat/keystore" keystorePass="注册证书的密码" />
+
+配置tomcat日志
+日志存放在/usr/local/tomcat/log/下
+虚拟主机把默认主机的<Valve.../>段复制下来,修改prefix="日志文件名"即可使用
+
+
+
+
+
+
+
+
+
+
+
+
