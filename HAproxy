@@ -32,7 +32,7 @@ defaults
     stats realm Haproxy Manager #进入管理解面查看状态信息
     stats auth admin:admin  #统计页面用户名和密码设置
   #stats hide-version   #隐藏统计页面上HAProxy的版本信息
-listen  name 0.0.0.0:80　　定义集群名字,ip,端口(*:80)
+listen  name 0.0.0.0:80　　定义集群名字,自身所有ip,端口(*:80)
    balance roundrobin      定义算法为轮询模式
    server  web1 192.168.2.100:80 check inter 2000 rise 2 fall 5     添加后端服务器与健康检查
    server  web2 192.168.2.200:80 check inter 2000 rise 2 fall 5
