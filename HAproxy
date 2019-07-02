@@ -24,6 +24,7 @@ defaults
  timeout client 300000 ###客户端连接超时
  timeout server 300000 ###服务器连接超时
  maxconn  60000  ###最大连接数
+# main frontend which proxys to the backends
  把原配置到此删掉下面内容，以下配置手写－－－－－－－－－－－－－－－－－－－－－－－－－－
  retries  3   ###3次连接失败就认为服务不可用，也可以通过后面设置
  listen stats 0.0.0.0:1080   #监听端口　　定义状态页面
