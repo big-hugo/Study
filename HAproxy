@@ -14,10 +14,11 @@ global
  group haproxy
  daemon       ###创建1个进程进入deamon模式运行
 defaults
- mode http    ###默认的模式mode { tcp|http|health } log global   ###采用全局定义的日志
- option dontlognull  ###不记录健康检查的日志信息
+ mode http    ###默认的模式mode { tcp|http|health } ,请求到后端服务器之间的连接协议
+ log global   ###指定日志地址和记录日志条目的 syslog/rsyslog日志设备，此处的 global表示使用 global配置段中设定的log值。
+ option dontlognull  ###日志记录选项,dontlognull表示不记录空会话连接日志.
  option httpclose  ###每次请求完毕后主动关闭http通道
- option httplog   ###日志类别http日志格式
+ option httplog   ###日志记录选项,httplog表示记录与 HTTP会话相关的各种属性值，包括 HTTP请求、会话状态、连接数、源地址以及连接时间等。
  option forwardfor  ###后端服务器可以从Http Header中获得客户端ip
  option redispatch  ###serverid服务器挂掉后强制定向到其他健康服务器
  timeout connect 10000 #如果backend没有指定，默认为10s（10000毫秒）
@@ -34,9 +35,9 @@ defaults
     stats auth admin:admin  #统计页面用户名和密码设置
   #stats hide-version   #隐藏统计页面上HAProxy的版本信息
 listen  name 0.0.0.0:80　　定义集群名字,自身所有ip,端口(*:80)
-   balance roundrobin      定义算法为轮询模式
+   balance roundrobin      定义算法为轮询模式(leastconn最少连接,source客户端根据hash值与服务端绑定)
    server  web1 192.168.2.100:80 check inter 2000 rise 2 fall 5     添加后端服务器与健康检查
-   server  web2 192.168.2.200:80 check inter 2000 rise 2 fall 5
+   server  web2 192.168.2.200:80 check inter 2000 rise 2 fall 5     inter 2s指定了对web2进行健康检查的时间隔是2s，rise 4 表示发起4次健康检查均正常则认为正常，3表示连续3次健康检查失败则认为己经故障
  systemctl start haproxy　           启动服务
 
 
