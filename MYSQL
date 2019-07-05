@@ -1,7 +1,7 @@
 mysql初始化
 grep password /var/log/mysqld.log    第一次启动时,mysql会自动为root账户配置随机密码,我们需要通过日志查看该密码
 mysql  -u用户  -p'密码'        登录数据库
-set global validate_password_policy=0;  //(0验证长度);(1长度,数字.大写,小写,特殊符号);(2长度;数字、大写小写,特殊符号;字典文件)
+set global validate_password_policy=0;  //(0验证长度);(默认值1长度,数字.大写,小写,特殊符号);(2长度;数字、大写小写,特殊符号;字典文件)
 set global validate_password_length=6;  //修改密码长度,默认值是8个字符
 alter user user() identified by "123456";  //修改登陆密码
 vim /etc/my.cnf             //修改配置添加如下内容,永久设置密码验证
@@ -22,6 +22,16 @@ desc 库名.表名;           查看表结构
 insert    into   库名.表名 values('','',...);    插入数据
 update  库名.表名   set 字段=''  where 字段='';    更新数据
 delete from 库名.表名  where  字段='';            删除数据
+
+常用的语法格式如下：
+ALTER TABLE <表名> [修改选项]
+修改选项的语法格式如下：
+ ADD COLUMN <列名> <类型>
+ CHANGE COLUMN <旧列名> <新列名> <新列类型>
+ ALTER COLUMN <列名> { SET DEFAULT <默认值> | DROP DEFAULT }
+ MODIFY COLUMN <列名> <类型>
+ DROP COLUMN <列名>
+ RENAME TO <新表名> }
 
 
 
@@ -46,7 +56,7 @@ smallint    -32768~32767   0~65535     小整数
 mediumint    -2^23~2^23-1  0~2^23-1    中整数
 int          -2^31~2^31-1  0~2^31-1    大整数
 bigint       -2^63~2^63-1  0~2^63-1    极大整数
-float        -2^31~2^31-1  0~2^32-1    单精度浮点数(M,D)其中 M 为总宽度,D 为小数位数,M 应大于 D
+float        -2^31~2^31-1  0~2^32-1    单精度浮点数(M,D)其中 M 为总位数宽度,D 为小数位数,M 应大于 D
 double       -2^63~2^63-1  0~2^64-1    双精度浮点数(M,D)
 datetime日期时间类型   范围1000-01-01 00:00:00:000000~9999-12-31 23:59:59.999999  如果不给该类型的数据赋值,则默认为NULL
 timestamp日期时间类型  范围1970-01-01 00:00:00:000000~2038-01-19 03:14:07.999999   如果不给该类型的数据赋值,则mysql自动为其分配当前的系统时间
