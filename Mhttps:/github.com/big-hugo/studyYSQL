@@ -1,6 +1,6 @@
 mysql初始化
 grep password /var/log/mysqld.log    第一次启动时,mysql会自动为root账户配置随机密码,我们需要通过日志查看该密码
-mysql-u用户 -p'密码'        登录数据库
+mysql  -u用户  -p'密码'        登录数据库
 set global validate_password_policy=0;  //(0验证长度);(1长度,数字.大写,小写,特殊符号);(2长度;数字、大写小写,特殊符号;字典文件)
 set global validate_password_length=6;  //修改密码长度,默认值是8个字符
 alter user user() identified by "123456";  //修改登陆密码
