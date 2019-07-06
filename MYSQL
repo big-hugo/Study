@@ -17,21 +17,58 @@ select database();       查看当前数据库
 create databases 库名 character set utf8mb4;   创建数据库支持中文(数字、字母、下划线,不能纯数字;区分大小写;不能使用关键词或特殊符号)
 drop  database  库名;     删除数据库
 drop datebase  库名.表名;  删除表
-create table 库名.表名(字段  char(20),...);    创建表
+create table 库名.表名(字段  char(20),...);    创建表 (not null非空,default '默认值')  
 desc 库名.表名;           查看表结构
-insert    into   库名.表名 values('','',...);    插入数据
+insert    into   库名.表名(字段,字段...)  values('','',...);    插入数据,不输入字段默认给全部字段赋值
 update  库名.表名   set 字段=''  where 字段='';    更新数据
 delete from 库名.表名  where  字段='';            删除数据
+show index from 表名\G;          查看表索引(\G竖显示表格)
+show create table 表名\G;        查看建表记录
 
-常用的语法格式如下：
-ALTER TABLE <表名> [修改选项]
+表结构(字段约束条件,控制字段赋值)
+create table test(
+id int(3) primary key ,                 定义主键
+tel char(15) not null,                  定义非空
+name char(6) default 'OYZH',            定义默认值
+index(id,name)                          定义索引
+engine=innodb);                         定义数据引擎类型为innodb
+
+
+key键值:
+普通索引  index         增加查询速度,降低删改查速度,占用物理空间记录排队信息,多用于需要查询的字段.算法类型(默认Btree,B+tree,hash)
+index(id,name));                       定义索引
+show index from 表名\G;          查看表索引(\G竖显示表格)
+create index 索引标记 on 表名(字段);      创建索引
+drop index 索引标记 on 表名;              删除索引
+
+唯一索引  unique
+全文索引  fulltext
+
+主键     primary key   唯一性,非空,多字段为主键称为复合主键,必须一起创建
+id int(3) primary key ,                 定义主键
+primary key(id,name)                   定义复合主键
+id int primary key auto_increment      定义自增长主键(删除所有也会记录上一个值,可以自插入id)
+alter table 表名 add primary key(字段);   添加主键
+alter table 表名 drop primary key;       删除主键
+
+外键     foreign key    插入记录时,字段值在另一个表字段值范围内选择,类型要一致,被参考必须是索引的一种,表储存引擎必须是innodb
+create table 表名( id int ,               定义字段
+foreign key(字段) references 表名(字段)    定义外键
+on update cascade on delete cascade      同步更新,同步删除
+)engine=innodb;                          指定存储引擎
+show create table 表名\G;                    查看外键
+alter table 表名 drop  foreign key 外键名;    删除外键
+
+
+表结构编辑常用的语法格式如下：
+ALTER TABLE <表名> [修改选项]   {after 列名 | first}  调整位置
 修改选项的语法格式如下：
- ADD COLUMN <列名> <类型>
- CHANGE COLUMN <旧列名> <新列名> <新列类型>
- ALTER COLUMN <列名> { SET DEFAULT <默认值> | DROP DEFAULT }
- MODIFY COLUMN <列名> <类型>
- DROP COLUMN <列名>
- RENAME TO <新表名> }
+ ADD  <列名> <类型>
+ CHANGE  <旧列名> <新列名> <新列类型>
+ ALTER  <列名> { SET DEFAULT <默认值> | DROP DEFAULT }
+ MODIFY  <列名> <类型>
+ DROP  <列名>  , <列名>
+ RENAME  <新表名> 
 
 
 
