@@ -182,7 +182,7 @@ mysql               命令行                跨平台               官方bundl
 MYSQL-Workbench     图形                 跨平台               官方自带
 MYSQL-Front         图形                Windows               开源,轻量级客户端软件
 Navicat             图形                Windows              专业,功能强大,商业
-phpMyAdmin          浏览器              跨平台                 开源,需要LANP平台
+phpMyAdmin          浏览器              跨平台                 开源,需要LANP平台,解压源码包到网页目录下即可在浏览器中访问
 
 
 
