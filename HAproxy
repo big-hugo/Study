@@ -20,7 +20,7 @@ defaults
  option httpclose  ###每次请求完毕后主动关闭http通道
  option httplog   ###日志记录选项,httplog表示记录与 HTTP会话相关的各种属性值，包括 HTTP请求、会话状态、连接数、源地址以及连接时间等。
  option forwardfor  ###后端服务器可以从Http Header中获得客户端ip
- option redispatch  ###serverid服务器挂掉后强制定向到其他健康服务器
+ option redispatch  ###web服务器挂掉后强制定向到其他健康的web服务器
  timeout connect 10000 #如果backend没有指定，默认为10s（10000毫秒）
  timeout client 300000 ###客户端连接超时
  timeout server 300000 ###服务器连接超时
