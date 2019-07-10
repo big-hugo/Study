@@ -131,10 +131,8 @@ show variables like 'secure_file_priv';        查看搜索路径(默认/var/lib
 chown  mysql  自定义目录          修改自定义目录权限
 vim /etc/my.cnf                 修改配置文件,添加下面一句
 secure_file_priv='自定义目录'     定义搜索路径目录,重启服务后生效
-
 数据导入:把系统文件的内容存储到表里
 load data infile '搜索路径/文件' into table 表名 fields terminated by '分隔符'  lines terminated by '\n';   导入文件到表中作为数据
-
 数据导出:把输出的内容导出到搜索路径
 select命令 into outfile '/搜索路径/文件名' [fileds terminated by '分隔符' lines terminated by '换行符'];   导出查询结果
 
@@ -144,8 +142,20 @@ cp -r /var/lib/mysql  备份目录/mysql.bak    复制数据库文件
 tar -zxf 备份目录/mysql.bak.gz  /var/lib/mysql/*   打包数据库文件
 chown  -R  mysql:mysql   /var/lib/mysql          恢复数据需要给文件目录授权
 逻辑备份方案
+musqldump -u用户 -p密码 库.表 > 目录/xx.sql         导出数据   -A全部库    -B  库1 库2  多个库
 
-
+binlog日志
+二进制日志,记录除查询之外所有SQL命令,可用于数据备份和恢复
+vim /etc/my.cnf           修改配置文件,添加下面信息
+log-bin[=目录名/文件名]     定义日志文件名和位置 
+server_id=数字             定义主机id(1~255)
+[binlog_format='格式']       定义日志格式      statement报表模式   row行模式   默认mixed混合模式
+[max_binlog_size=数值m]      定义日志容量,默认1G
+重启服务生效
+purge master logs to '日志文件名';    删除指定日志
+reset master;                       删除所有日志
+show variables like 'binlog_format';     查看日志记录格式    statement报表模式   row行模式   mixed混合模式
+mysqlbinlog [--start-position=偏移量 --stop-position=偏移量] 日志文件 | mysql -u用户名 -p密码   导入日志文件恢复数据     --start/stop-datetime='yyyy-mm-dd hh:mm:ss' 根据时间恢复
 
 
 
@@ -185,8 +195,30 @@ Navicat             图形                Windows              专业,功能强�
 phpMyAdmin          浏览器              跨平台                 开源,需要LANP平台,解压源码包到网页目录下即可在浏览器中访问
 
 
-
-
+mysql备份工具
+XtarBackup工具,备份过程不锁表
+安装软件 libev     percona-xtrabackup
+备份机
+innobackupex --user root --password 123456 备份文件    备份全部库    --database指定库    --no-timestamp不以时间命名
+还原机
+systemctl stop mysqld.service         关服务
+rm -rf /var/lib/mysql/*               删原本库文件
+innobackupex --apply-log  备份文件     准备备份
+innobackupex --copy-back  备份文件     开始备份
+chown -R mysql:mysql /var/lib/mysql   授权
+systemctl start  mysqld               起服务
+增量备份
+innobackupex --user root --password 123456 首备份目录  [--no-timestamp]   首备份(完全备份)
+innobackupex --user root --password 123456 --incremental 增量备份目录 --incremental-basedir=上次备份目录  [--on-timestamp]     增量备份
+增量恢复
+systemctl stop mysqld            关闭服务
+rm -rf /var/lib/mysql/*          删除数据库文件
+innobackupex --apply-log --redo-only  首备份目录     准备恢复数据
+innobackupex --apply-log --redo-only  首备份目录 --incremental-dir=增量备份目录   增量合并
+innobackupex --copy-back  首备份目录    拷贝文件
+chown -R mysql:mysql /var/lib/mysql   授权
+systemctl start mysqld           启动服务
+ 
 
 
 
