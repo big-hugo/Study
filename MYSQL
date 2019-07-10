@@ -198,13 +198,11 @@ phpMyAdmin          浏览器              跨平台                 开源,需�
 mysql备份工具
 XtarBackup工具,备份过程不锁表
 安装软件 libev     percona-xtrabackup
-备份机
-innobackupex --user root --password 123456 备份文件    备份全部库    --database指定库    --no-timestamp不以时间命名
-还原机
+innobackupex --user root --password 123456 备份文件    备份全部    --database指定库    --no-timestamp不以时间命名
 systemctl stop mysqld.service         关服务
 rm -rf /var/lib/mysql/*               删原本库文件
-innobackupex --apply-log  备份文件     准备备份
-innobackupex --copy-back  备份文件     开始备份
+innobackupex --apply-log  备份文件     准备恢复
+innobackupex --copy-back  备份文件     拷贝数据到库文件目录
 chown -R mysql:mysql /var/lib/mysql   授权
 systemctl start  mysqld               起服务
 增量备份
@@ -215,9 +213,19 @@ systemctl stop mysqld            关闭服务
 rm -rf /var/lib/mysql/*          删除数据库文件
 innobackupex --apply-log --redo-only  首备份目录     准备恢复数据
 innobackupex --apply-log --redo-only  首备份目录 --incremental-dir=增量备份目录   增量合并
-innobackupex --copy-back  首备份目录    拷贝文件
+innobackupex --copy-back  首备份目录    拷贝文件到库文件目录
 chown -R mysql:mysql /var/lib/mysql   授权
 systemctl start mysqld           启动服务
+恢复单张表
+delete from db3.user2;           误删除数据库
+alter table db3.user2 discard tablespace;      删除表空间
+innobackupex --apply-log  --export 备份目录     导出表信息
+cp  备份目录/db3/user2.{cfg,exp,ibd}  /var/lib/mysql/db3/    拷贝表信息到数据库目录下
+chown  -R  mysql:mysql  /var/lib/mysql         授权
+alter table  db3.user2   import  tablespace;          导入表空间
+rm -rf /var/lib/mysql/db3/user2.cfg  /var/lib/mysql/db3/user2.exp  删除数据库目录下的表信息文件
+select * from db3.user2;          查看表记录
+
  
 
 
