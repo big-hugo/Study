@@ -152,10 +152,14 @@ log-bin[=目录名/文件名]     定义日志文件名和位置
 server_id=数字             定义主机id(1~255)
 [binlog_format='格式']       定义日志格式      statement报表模式   row行模式   默认mixed混合模式
 [max_binlog_size=数值m]      定义日志容量,默认1G
+chown mysql 日志文件目录      授权给日志文件目录
 重启服务生效
 purge master logs to '日志文件名';    删除指定日志
 reset master;                       删除所有日志
+flush logs;                         刷新日志(新建一份日志)
 show variables like 'binlog_format';     查看日志记录格式    statement报表模式   row行模式   mixed混合模式
+show master status;                 查看日志信息
+mysqlbinlog 日志文件名               查看日志文件内容，偏移量
 mysqlbinlog [--start-position=偏移量 --stop-position=偏移量] 日志文件 | mysql -u用户名 -p密码   导入日志文件恢复数据     --start/stop-datetime='yyyy-mm-dd hh:mm:ss' 根据时间恢复
 
 
@@ -221,7 +225,7 @@ systemctl start mysqld           启动服务
 delete from db3.user2;           误删除数据库
 alter table db3.user2 discard tablespace;      删除表空间
 innobackupex --apply-log  --export 备份目录     导出表信息
-cp  备份目录/db3/user2.{cfg,exp,ibd}  /var/lib/mysql/db3/    拷贝表信息到数据库目录下
+cp  备份目录/db3/user2.{cfg,exp,ibd}  /var/lib/mysql/db3/    拷贝表信息到数据库目录下    frm记录表结构  ibd存储数据
 chown  -R  mysql:mysql  /var/lib/mysql         授权
 alter table  db3.user2   import  tablespace;          导入表空间
 rm -rf /var/lib/mysql/db3/user2.cfg  /var/lib/mysql/db3/user2.exp  删除数据库目录下的表信息文件
