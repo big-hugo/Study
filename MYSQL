@@ -31,14 +31,14 @@ set password for 用户名@'登录地址' = password('密码'); 为用户修改�
 
 root密码恢复
 vim /etc/my.cnf     修改配置文件,添加下一行
-skip-grant-tables   跳过授权表
+skip_grant_tables=1   跳过授权表
 systemctl restart mysqld 重启服务
 update mysql.user set authentication_string=password('密码') where user='root' and host='登录地址';  修改密码
 flush privileges;   刷新权限表
 
 
 grant授权(存在mysql.user表里)
-grant 权限 on 库.表 to 用户@'客户端地址' identified by '密码' [with grant options];   授权用户[有授权权限]
+grant 权限 on 库.表 to 用户@'客户端地址' identified by '密码' [with grant option];   授权用户[有授权权限]
 权限列表: all所有权限   usage无权限  select update insert 个别权限   update('',''...)指定字段权限
 登录地址:  %所有   192.168.4.% 网段    loaclhost本机
 show grants;                 显示自身访问权限            
@@ -111,7 +111,7 @@ order by 字段 desc | asc  查询结果降序|升序排序
 group by 字段             分组查询
 having  条件              查询结果过滤
 limit   3 ;               显示前三行
-limit  0,3;               显示1到3行
+limit  0,3;               显示1到3行（0表示起始行，3表示总行数）
 
 内置函数
 select curtime();         获得当前系统时间
@@ -120,7 +120,7 @@ select now(),sysdate();   获得系统当前日期和时间
 database()                当前所在库
 user()                    当前用户名和登录地址
 avg(字段)                  计算平均值
-sum(字段)                  求和
+sum(字段)                  ..-0求和
 min(字段)                  最小值
 max(字段)                  最大值
 count(字段)                个数
