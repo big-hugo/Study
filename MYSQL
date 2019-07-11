@@ -28,14 +28,20 @@ show create table 表名\G;        查看建表记录
 system  系统命令;                可以在mysql中执行系统命令
 set password=password('密码');   修改密码 
 set password for 用户名@'登录地址' = password('密码'); 为用户修改密码
+\c                             取消当前输入命令换行
 
 root密码恢复
 vim /etc/my.cnf     修改配置文件,添加下一行
-skip_grant_tables=1   跳过授权表
+skip-grant-tables   跳过授权表
 systemctl restart mysqld 重启服务
 update mysql.user set authentication_string=password('密码') where user='root' and host='登录地址';  修改密码
 flush privileges;   刷新权限表
 
+授权记录表
+mysql.user     记录已有授权用户
+mysql.db       记录已被授权的库
+mysql.tables_priv     记录已被授权的表
+mysql.columns_priv    记录已被授权的字段
 
 grant授权(存在mysql.user表里)
 grant 权限 on 库.表 to 用户@'客户端地址' identified by '密码' [with grant option];   授权用户[有授权权限]
@@ -46,11 +52,6 @@ show grants for 用户名@'登录地址';       显示用户权限
 drop user 用户名;             删除授权用户
 revoke 权限 on 库.表 from 用户@'登录地址';   删除用户权限 
 
-授权记录表
-mysql.user     记录已有授权用户
-mysql.db       记录已被授权的库
-mysql.tables_priv     记录已被授权的表
-mysql.columns_priv    记录已被授权的字段
 
 表结构(字段约束条件,控制字段赋值)
 create table test(
@@ -84,7 +85,7 @@ drop index 索引标记 on 表名;              删除索引
 主键     primary key   唯一性,非空,多字段为主键称为复合主键,必须一起创建
 id int(3) primary key ,                 定义主键
 primary key(id,name)                   定义复合主键
-id int primary key auto_increment      定义自增长主键(删除所有也会记录上一个值,可以自插入id)
+id int primary key auto_increment      定义自增长主键(删除所有也会记录上一个值,可以自插入id改变)
 alter table 表名 add primary key(字段);   添加主键
 alter table 表名 drop primary key;       删除主键
 
@@ -120,7 +121,7 @@ select now(),sysdate();   获得系统当前日期和时间
 database()                当前所在库
 user()                    当前用户名和登录地址
 avg(字段)                  计算平均值
-sum(字段)                  ..-0求和
+sum(字段)                  0求和
 min(字段)                  最小值
 max(字段)                  最大值
 count(字段)                个数
