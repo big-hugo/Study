@@ -1,0 +1,64 @@
+mysql主从同步,主更新会在从上更新,从更新与主无关
+原理master启用binlog日志;
+slave_IO复制master的binlog日志到本机的relay-log文件,slave_SQL执行relay-log里面的语句确保和主机一样
+/var/lib/mysql/master.info记录主机配置信息  /var/lib/mysql/relay-log.info记录本机配置信息
+cd /var/lib/mysql/              进入配置文件目录
+rm -rf master.info  relay-log.info  *relay-bin*   清除主从配置文件
+主服务器配置:
+vim /etc/my.cnf                      修改配置文件
+log-bin=日志文件名                     定义binlog日志文件
+server_id=服务器id号                   定义服务器id号
+grant replication slave on *.* to slave@'%' identified by '123456';     授权从属用户
+show master status;                  查看日志状态
+mysqldump -uroot -p123456 --master-data 库 > /root/xx.sql     导出数据库文件   master-data记录日志名称和偏移量
+scp /root/xx.sql root@192.168.4.52:/                          发送数据库文件给从服务器
+从服务器配置:
+vim /etc/my.cnf                       修改配置
+server_id=服务器id号                    定义服务器id号,与主服务器不同
+mysql -uroot -p123456  库  <  /xx.sql   导入数据库文件
+vim /xx.sql                         查看日志文件名和偏移量
+change master to master_host='192.168.4.51',        输入主库信息
+    -> master_user='slave',
+    -> master_passowrd='123456',
+    -> master_log_file='日志名',
+    -> master_log_pos=偏移量;
+start slave;                          开启进程
+show slave status;                    查看状态(里面有排错信息)
+
+主从服务器结构
+一主多从结构:从--->主<----从
+主从从结构:主<--从<--从      中间机子配置文件加入log_slave_updates   允许级联复制
+主主结构:主<----->主
+
+复制模式介绍
+异步复制(默认 ):主库执行完一次事务后,立即返回给客户端,不管从库是否接受并处理
+全同步复制:主库执行玩一次事务,并且所有从库执行了该事务,才返回结果给客户端
+半同步复制:主库执行完一次事务后,等待至少一个从库收到并写到relay log中才返回给客户端
+show  variables like 'have_dynamic_loading';        查看是否允许加载动态模块(默认允许)
+install plugin  rpl_semi_sync_master  SONAME  ”semisync_master.so”;    加载master模块,在主库上执行
+install plugin  rpl_semi_sync_master  SONAME  ”semisync_slave.so”;    加载slave模块,在从库上执行
+select plugin_name, plugin_status from information_schema.plugins where  plugin_name like '%semi%';  查看模块是否安装成功
+set  global rpl_semi_sync_master_enabled = 1;   启用 master 半同步复制,在主库执行,默认关闭
+set  global rpl_semi_sync_slave_enabled = 1;    启用 slave 半同步复制,在从库执行,默认关闭
+show variables like "rpl_semi_sync_%_enabled";  查看半同步模式模块是否启用
+修改配置文件,永久启用半同步复制
+vim /etc/my.cnf
+plugin-load="rpl_semi_sync_master=semisync_master.so"      加载master模块,在主库上配置
+plugin-load="rpl_semi_sync_slave=semisync_slave.so"        加载slave模块,在从库上配置
+rpl-semi-sync-master-enabled = 1           启用 master 半同步复制,在主库配置
+rpl-semi-sync-slave-enabled = 1            启用 slave 半同步复制,在从库配置
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
