@@ -2,7 +2,7 @@ cal  1752    查看年历
 route -n      查看路由表
 echo "/usr/local/nginx/sbin/nginx" >> /etc/rc.local   设定开机自启的命令
 /usr/lib/systemd/system/此目录下可以设置systemctl管理的服务,可通过复制目录下的源文件修改命令路径使用 type=forking
-
+which java    查看命令路径
 
 
 
