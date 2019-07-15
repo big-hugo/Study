@@ -134,7 +134,7 @@ sed -i '16,18d' /usr/local/mycat/conf/schema.xml
 sed -i '36,39d' /usr/local/mycat/conf/schema.xml
 vim /usr/local/mycat/conf/schema.xml   定义后台主机,表规则,连接用户
 <schema>...</schema>定义分片信息   name逻辑库   dataNode指定数据节点名   rule指定使用的分片规则   type=global数据不分片存储,每台主机都可查
-<dataNode/>定义数据节点   name数据节点  datahost数据库服务器主机名  database数据库名
+<dataNode/>定义数据节点   name数据节点  datahost数据库服务器主机名  database数据库名(需在相应服务器上创建同名的)
 <datahost name=hostname1><writeHost host="hostM1" url="192.168.4.53:3306" user="big"password="123456"></datahost> 定义主机名的ip地址
 /usr/local/mycat/bin/mycat/ start    启动服务(端口8066),可--help查看命令
 mysql -h分片主机IP -P8066 -u用户 -p密码  客户端连接分片服务器,里面有个TESTDB库,库里面的表是配置文件里定义的表,需要重新定义表结构
