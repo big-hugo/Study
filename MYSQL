@@ -1,3 +1,5 @@
+数据库,存储描述信息的库
+
 mysql初始化
 grep password /var/log/mysqld.log    第一次启动时,mysql会自动为root账户配置随机密码,我们需要通过日志查看该密码
 mysql  -u用户  -p'密码'        登录数据库
