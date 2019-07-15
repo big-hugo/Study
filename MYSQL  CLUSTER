@@ -119,6 +119,51 @@ useradd mysql           新建mysql用户
 mysql -hip地址 -P端口 -u用户 -p密码           客户端访问实例数据库
 
 
+数据分片
+将存放在一台数据库服务器中的数据,按照特定的方式进行拆分,分散在多台数据库服务器中
+mycat是基于java分布式数据库系统中间件,为高并发环境的分布式存储提高解决方案,适合数据大量写入的存储需求,提供数据读写分离服务,数据分片服务
+工作过程:解析命令涉及到的表,看表配置,如果有分片规则,调用分片函数,发送命令到对应的分片服务器去执行
+主要文件 server.xml定义连接到分片机的用户  rule.xml定义分片规则函数  schema.xml定义逻辑库,表,连接用户,后台主机,表结构
+分片规则:枚举法sharding-by-intfile   固定分片rule1  范围约定anto-sharding-long  求模法mod-long  日期列分区法sharding-by-date  一致性hash sharding-by-murmur
+sharding-by-pattern通配取模  ASCII码求模通配sharding-by-prefixpattern  编程指定sharding-by-substring  字符串拆分hash解析sharding-by-stringhash
+部署mycat
+yum安装java-1.8.0-openjdk,解压Mycat-server-1.6-RELEASE,移动到/usr/local下
+server.xml设置连接账号及逻辑库名   schema.xml配置数据分片  rule.xml分片规则  *.txt函数调用文件  wrapper.log服务启动日志  mycat.log记录报错内容
+sed -i '56,77d' /usr/local/mycat/conf/schema.xml    删除备注行 (删之前先备份主配置文件)
+sed -i '16,18d' /usr/local/mycat/conf/schema.xml 
+sed -i '36,39d' /usr/local/mycat/conf/schema.xml
+vim /usr/local/mycat/conf/schema.xml   定义后台主机,表规则,连接用户
+<schema>...</schema>定义分片信息   name逻辑库   dataNode指定数据节点名   rule指定使用的分片规则   type=global数据不分片存储,每台主机都可查
+<dataNode/>定义数据节点   name数据节点  datahost数据库服务器主机名  database数据库名
+<datahost name=hostname1><writeHost host="hostM1" url="192.168.4.53:3306" user="big"password="123456"></datahost> 定义主机名的ip地址
+/usr/local/mycat/bin/mycat/ start    启动服务(端口8066),可--help查看命令
+mysql -h分片主机IP -P8066 -u用户 -p密码  客户端连接分片服务器,里面有个TESTDB库,库里面的表是配置文件里定义的表,需要重新定义表结构
+sharding-by-intfile枚举法分片规则配置
+新建employee表中有sharding_id字段int类型,会根据sharding_id的值把数据分配到不同数据库主机里
+vim /usr/local/mycat/conf/partition-hash-int.txt
+10000=0  数据存储在dn1库里
+10010=1  数据存储在dn2库里
+10020=2  数据存储在dn3库里
+重启服务  
+mod-long求模法分片规则配置
+新建hotnews表根据id字段对3取余,得到0,1,2分别存入三台数据库主机
+vim /usr/local/mycat/conf/rule.xml 文件可以修改取余数
+重启服务
+添加逻辑库,表
+vim /usr/local/mycat/conf/schema.xml   修改配置文件
+<schema>...</schema>                   新建schema段,修改里面的配置
+vim /usr/local/mycat/conf/server.xml   修改配置文件
+<user name="root">
+<property name="schemas">TESTDB,新库名</property>  添加新库名
+重启服务
+
+
+
+
+
+
+
+
 
 
 
