@@ -158,6 +158,52 @@ vim /usr/local/mycat/conf/server.xml   修改配置文件
 重启服务
 
 
+MHA高可用数据库切换
+数据库的自动故障切换能在0~30秒之内完成
+yum -y install perl-*      在集群相关的所有主机上安装系统自带的perl软件包(还有另外的perl包上网找资源)
+ssh-keygen -f /root/.ssh/id_rsa -N ''   创建秘钥对,实现无密码连接
+ssh-copy-id root@目标ip     服务器之间可以无密码连接,管理器和服务器之间也可以
+管理器
+rpm -ivh mha4mysql-node-0.56-0.el6.noarch.rpm  安装提供MHA程序的软件包
+tar -zxf mha4mysql-manager-0.56.tar.gz
+cd mha4mysql-manager-0.56/
+perl Makefile.PL
+make && make install
+mkdir /etc/mha         新建配置文件夹
+vim  /etc/mha/app1.cnf      编写配置文件
+[server default]            管理服务默认配置
+manager_workdir=/etc/mha    工作目录
+manager_log=/etc/mha/manager.log    日志文件
+master_ip_failover_script=/etc/mha/master_ip_failover   故障切换脚本
+ssh_user=root       访问ssh服务用户
+ssh_port=22         ssh服务端口
+repl_user=repluser  主从数据授权用户
+repl_password=123qqq...A    密码
+user=root           管理器连接数据库的监控用户
+password=123qqq...A         密码
+[server1]               指定第一台数据库服务器
+hostname=192.168.4.51   服务器IP地址
+candidate_master=1      竞选主库
+[server2]
+hostname=192.168.4.52
+candidate_master=1
+[server3]
+hostname=192.168.4.53
+candidate_master=1
+cp master_ip_failover /etc/mha     复制切换脚本到配置文件夹下
+chmod +x /etc/mha/master_ip_failover       给执行权限
+vim +35 /etc/mha/master_ip_failover         修改切换脚本第35行
+$vip = '192.168.4.100/24';  # Virtual IP    定义vip地址
+数据库节点(配置成一主多从结构)
+
+
+
+
+
+
+
+
+
 
 
 
