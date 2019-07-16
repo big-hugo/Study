@@ -177,7 +177,7 @@ manager_log=/etc/mha/manager.log    日志文件
 master_ip_failover_script=/etc/mha/master_ip_failover   故障切换脚本
 ssh_user=root       访问ssh服务用户
 ssh_port=22         ssh服务端口
-repl_user=repluser  主从数据授权用户
+repl_user=repluser  主从连接数据授权用户
 repl_password=123qqq...A    密码
 user=root           管理器连接数据库的监控用户
 password=123qqq...A         密码
@@ -194,17 +194,38 @@ cp master_ip_failover /etc/mha     复制切换脚本到配置文件夹下
 chmod +x /etc/mha/master_ip_failover       给执行权限
 vim +35 /etc/mha/master_ip_failover         修改切换脚本第35行
 $vip = '192.168.4.100/24';  # Virtual IP    定义vip地址
-数据库节点(配置成一主多从结构)
-
-
-
-
-
-
-
-
-
-
+数据库节点配置(先配置成一主多从结构)
+ifconfig eth0:1 192.168.4.100     主数据库服务器配置VIP(仅在主库机上配置)
+grant replication slave on *.* to repluser@'%' identified by '123qqq...A';  授权主从连接用户(与管理器上配置文件中的一致)
+grant all on *.* to root@'%' identified by '123qqq...A';  监控用户(与管理器上配置文件中的一致)
+vim /etc/my.cnf      修改配置文件,每台节点都要
+server_id=53             定义服务器id
+log-bin=db53             开启binlog日志
+plugin-load="rpl_semi_sync_slave=semisync_slave.so;rpl_semi_sync_master=semisync_master.so"    加载主从模块
+rpl-semi-sync-master-enabled = 1    启用master模块
+rpl-semi-sync-slave-enabled = 1     启用slave模块
+relay_log_purge=0         关闭自动删除中继日志文件
+rpm -ivh mha4mysql-node-0.56-0.el6.noarch.rpm   安装mha_node包,每台节点都要
+管理器测试
+masterha_check_ssh --conf=/etc/mha/app1.cnf    测试ssh是否通畅,在管理器上操作
+masterha_check_repl --conf=/etc/mha/app1.cnf   测试主从同步配置,在管理器上操作
+管理器开启服务
+masterha_manager --conf=/etc/mha/app1.cnf --remove_dead_master_conf --ignore_last_failover  启动管理服务,删除宕机主库的配置,开启8小时内无限切换(不开启则8小时内只能切换一次)
+masterha_check_status --conf=/etc/mha/app1.cnf   开启服务为前台服务,此命令可检测是否正在运行
+masterha_stop    --conf=/etc/mha/app1.cnf   停止服务
+现在,客户端可以访问管理器的VIP来访问数据库,数据会在三台后台数据库中备份,一旦发生故障,管理器会切换主库
+修复故障服务器
+数据库集群中主库停止服务时,管理器的配置文件会删除那台机的记录,需要手动逻辑备份当前的主库,再修复配置文件,在重启管理器服务
+mysqldump -uroot -p123456 --master-data db9 > db9.sql    先现任主库机上做完全备份
+scp db9.sql root@192.168.4.51:/root/       发送给故障机
+mysql -uroot -p123456 db9 < /root/db9.sql   故障机导入完全备
+vim /root/db9.sql        查看主库的日志名和偏移量
+change  master  to ... ; 在故障机上重设主库信息
+start slave;             故障机开启slave进程
+vim /etc/mha/app1.cnf    在管理机上重新添加故障机的信息
+masterha_check_ssh --conf=/etc/mha/app1.cnf    管理机测试SSH
+masterha_check_repl --conf=/etc/mha/app1.cnf   管理机测试主从同步配置
+masterha_manager --conf=/etc/mha/app1.cnf --remove_dead_master_conf --ignore_last_failover 启动管理服务
 
 
 
