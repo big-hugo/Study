@@ -161,6 +161,7 @@ vim /usr/local/mycat/conf/server.xml   修改配置文件
 MHA高可用数据库切换
 数据库的自动故障切换能在0~30秒之内完成
 yum -y install perl-*      在集群相关的所有主机上安装系统自带的perl软件包(还有另外的perl包上网找资源)
+yum -y install perl-*      安装mha包里的perl包
 ssh-keygen -f /root/.ssh/id_rsa -N ''   创建秘钥对,实现无密码连接
 ssh-copy-id root@目标ip     服务器之间可以无密码连接,管理器和服务器之间也可以
 管理器
@@ -170,7 +171,7 @@ cd mha4mysql-manager-0.56/
 perl Makefile.PL
 make && make install
 mkdir /etc/mha         新建配置文件夹
-vim  /etc/mha/app1.cnf      编写配置文件
+vim  /etc/mha/app1.cnf      手写配置文件
 [server default]            管理服务默认配置
 manager_workdir=/etc/mha    工作目录
 manager_log=/etc/mha/manager.log    日志文件
