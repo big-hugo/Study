@@ -99,25 +99,30 @@ on update cascade on delete cascade      同步更新,同步删除
 show create table 表名\G;                    查看外键
 alter table 表名 drop  foreign key 外键名;    删除外键
 
+
 数据库结构体系
 连接池 sql接口 分析器 优化 查询缓存 命令工具 存储引擎 文件系统
 数据库存储引擎
 存储引擎不一样,数据存储方式不一样
 ls /var/lib/mysql/表名.*      查看不同的存储引擎不同的存储方式
-mysql 5.0~5.1  默认存储引擎 MyISAM   .frm表结构  .MYI索引  .MYD数据 支持表级锁,不支持事务和事务回滚,外键
-mysql 5.5~5.6  默认存储引擎 InnoDB   .frm表结构  .ibd表空间        支持行级锁定,支持事务和事务回滚,外键
+mysql 5.0~5.1  默认存储引擎 MyISAM   .frm表结构  .MYI索引  .MYD数据       支持表级锁,不支持事务和事务回滚,外键
+mysql 5.5~5.6  默认存储引擎 InnoDB   .frm表结构  .ibd表空间(数据加索引)     支持行级锁定,支持事务和事务回滚,外键
 show engines;          查看存储引擎 
 create table a(...)engine=innodb;     建表时定义存储引擎 
 alter table 库.表  engine=myisam;     修改表存储引擎
 vim /etc/my.cnf        修改配置文件,定义默认存储引擎
 default-storage-engine=myisam     定义默认存储引擎myisam
 mysql锁机制
-表级锁:对整张表加锁,锁时其他用户不能操作
-行级锁:对被访问的行加锁
+表级锁:对整张表加锁,锁时其他用户不能操作   myISAM  memory
+行级锁:对被访问的行加锁    InnoDB
+页级锁:会出现死锁；锁定粒度界于表锁和行锁之间，并发度一般  BDB
 锁类型
-读锁(共享锁):支持并发读
-写锁(互斥锁,排它锁):上锁期间其他线程不能读写表
-show status like '%table_lock%'
+读锁S(共享锁):支持并发读,不能insert  
+写锁x(互斥锁,排它锁):上锁期间其他线程不能读写表   
+show status like '%table_lock%';    查看锁状态
+lock table 表名 read;               上读锁
+lock table 表名 write;              上写锁
+unlock  tables;                    解锁表
 
 
 数据库事务(ACID)
@@ -128,8 +133,9 @@ show status like '%table_lock%'
 ls /var/lib/mysql/ibdata1 ib_logfile0 ib_logfile1  事务日志文件
 show variables like 'autocommit';    查看自动提交状态是否开启(默认开,仅针对当前连接)
 set autocommit=off;                  关闭自动提交功能,仅针对当前连接
+begin;              针对下面命令开启事务
 rollback;           事务回滚
-commit;             提交事务
+commit;             提交事务  
 
 
 查询语法
