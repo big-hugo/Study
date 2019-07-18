@@ -32,6 +32,8 @@ set password=password('密码');   修改密码
 set password for 用户名@'登录地址' = password('密码'); 为用户修改密码
 mysql -u用户 -p密码 -e 'sql命令'   在shell操作数据库
 \c                             取消当前输入命令换行
+show engines;            查看数据库存储引擎
+
 
 root密码恢复
 vim /etc/my.cnf     修改配置文件,添加下一行
@@ -40,12 +42,12 @@ systemctl restart mysqld 重启服务
 update mysql.user set authentication_string=password('密码') where user='root' and host='登录地址';  修改密码
 flush privileges;   刷新权限表
 
+
 授权记录表
 mysql.user     记录已有授权用户
 mysql.db       记录已被授权的库
 mysql.tables_priv     记录已被授权的表
 mysql.columns_priv    记录已被授权的字段
-
 grant授权(存在mysql.user表里)
 grant 权限 on 库.表 to 用户@'客户端地址' identified by '密码' [with grant option];   授权用户[有授权权限]
 权限列表: all所有权限   usage无权限  select update insert 个别权限   update('',''...)指定字段权限
@@ -61,8 +63,8 @@ create table test(
 id int(3) primary key ,                 定义主键
 tel char(15) not null,                  定义非空
 name char(6) default 'OYZH',            定义默认值
-index(id,name)                          定义索引
-engine=innodb);                         定义数据引擎类型为innodb
+index(id,name))                          定义索引
+engine=innodb;                         定义数据引擎类型为innodb
 
 表结构编辑常用的语法格式如下：
 ALTER TABLE <表名> [修改选项]   {after 列名 | first}  调整位置
@@ -81,17 +83,14 @@ index(id,name));                       定义索引
 show index from 表名\G;          查看表索引(\G竖显示表格)
 create index 索引标记 on 表名(字段);      创建索引
 drop index 索引标记 on 表名;              删除索引
-
 唯一索引  unique
 全文索引  fulltext
-
 主键     primary key   唯一性,非空,多字段为主键称为复合主键,必须一起创建
 id int(3) primary key ,                 定义主键
 primary key(id,name)                   定义复合主键
 id int primary key auto_increment      定义自增长主键(删除所有也会记录上一个值,可以自插入id改变)
 alter table 表名 add primary key(字段);   添加主键
 alter table 表名 drop primary key;       删除主键
-
 外键     foreign key    插入记录时,字段值在另一个表字段值范围内选择,类型要一致,被参考必须是索引的一种,表储存引擎必须是innodb
 create table 表名( id int ,               定义字段
 foreign key(字段) references 表名(字段)    定义外键
@@ -99,6 +98,39 @@ on update cascade on delete cascade      同步更新,同步删除
 )engine=innodb;                          指定存储引擎
 show create table 表名\G;                    查看外键
 alter table 表名 drop  foreign key 外键名;    删除外键
+
+数据库结构体系
+连接池 sql接口 分析器 优化 查询缓存 命令工具 存储引擎 文件系统
+数据库存储引擎
+存储引擎不一样,数据存储方式不一样
+ls /var/lib/mysql/表名.*      查看不同的存储引擎不同的存储方式
+mysql 5.0~5.1  默认存储引擎 MyISAM   .frm表结构  .MYI索引  .MYD数据 支持表级锁,不支持事务和事务回滚,外键
+mysql 5.5~5.6  默认存储引擎 InnoDB   .frm表结构  .ibd表空间        支持行级锁定,支持事务和事务回滚,外键
+show engines;          查看存储引擎 
+create table a(...)engine=innodb;     建表时定义存储引擎 
+alter table 库.表  engine=myisam;     修改表存储引擎
+vim /etc/my.cnf        修改配置文件,定义默认存储引擎
+default-storage-engine=myisam     定义默认存储引擎myisam
+mysql锁机制
+表级锁:对整张表加锁,锁时其他用户不能操作
+行级锁:对被访问的行加锁
+锁类型
+读锁(共享锁):支持并发读
+写锁(互斥锁,排它锁):上锁期间其他线程不能读写表
+show status like '%table_lock%'
+
+
+数据库事务(ACID)
+原子性:事务操作是一个整体,不可分隔,要么成功,要么失败
+一致性:事务操作时,表中记录没有变化
+隔离性:事务操作互相隔离不受影响
+持久性:数据一旦提交,不可改变,永久改变表数据
+ls /var/lib/mysql/ibdata1 ib_logfile0 ib_logfile1  事务日志文件
+show variables like 'autocommit';    查看自动提交状态是否开启(默认开,仅针对当前连接)
+set autocommit=off;                  关闭自动提交功能,仅针对当前连接
+rollback;           事务回滚
+commit;             提交事务
+
 
 查询语法
 select *　from 表 where is null / is not null      查询空值/非空值
@@ -128,6 +160,7 @@ sum(字段)                  0求和
 min(字段)                  最小值
 max(字段)                  最大值
 count(字段)                个数
+
 
 搜索路径
 数据的导入导出要在这个目录中进行
