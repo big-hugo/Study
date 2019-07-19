@@ -1,0 +1,35 @@
+NoSQL=Not Only SQL
+泛指非关系型数据库,不需预先定义数据存储结构,每条记录可以有不同的数据类型和字段个数 mencached redis mongodb couchdb neo4j flockdb
+
+Redis
+远程字典服务器,高性能分布式内存数据库,定期把内存数据存储到硬盘,支持主从模式,支持多种数据类型,默认端口6379
+源码包安装
+rpm -q gcc || yum -y install gcc      检查gcc是否安装
+tar -xf redis-4.0.8.tar.gz            解开源码包
+cd redis-4.0.8                        进入解压后目录
+make && make install                  编译安装
+./utils/install_server.sh             执行初始化脚本,启动redis(一路回车)
+/etc/init.d/redis_6379 stop           停止服务(start开启)
+redis-cli                             连接本机redis服务
+/var/lib/redis/6379/                  库文件存放目录
+
+redis基本操作(key-values存储结构)
+keys *              查看所有变量名(*匹配任意多个字符  ?匹配单个字符)
+set  变量  值        定义变量(字符类型)        mset  变量  值 ...   定义多个变量
+get  变量            获取变量值               mget   变量 ...      获取多个变量值
+del  变量            删除变量                select  0-15        切换库(默认0-15库)
+exists   变量        查看变量是否存在          type   变量          查看变量类型
+ttl  变量            查看key生存时间(-1永久,-2过期)
+expire   变量  秒数   设置变量有效时间(单位秒)
+move 变量 库号        移动变量到指定库
+flushdb              删除所在库所有变量        flushall            删除所有key 
+save                 保存变量到硬盘           shutdown            停止服务
+exit                退出
+
+
+
+
+
+
+
+
