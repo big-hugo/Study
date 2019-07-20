@@ -26,6 +26,81 @@ flushdb              删除所在库所有变量        flushall            删�
 save                 保存变量到硬盘           shutdown            停止服务
 exit                退出
 
+配置文件解析
+vim /etc/redis/6379.conf
+配置分类
+NETWORK网络  GENERAL常规  SNAPSHOTTING快照  REPLICATION复制  SECURITY安全  CLIENTS客户端  MEMORY MANAGEMENT内存管理
+数据单位
+ 1k => 1000 bytes
+ 1kb => 1024 bytes
+ 1m => 1000000 bytes
+ 1mb => 1024*1024 bytes
+ 1g => 1000000000 bytes
+ 1gb => 1024*1024*1024 bytes
+ units are case insensitive so 1GB 1Gb 1gB are all the same.
+常用配置
+port 6379             端口
+bind 127.0.0.1        ip地址
+daemonize yes         守护进程方式运行
+datebases 16          数据库个数
+logfile  /var/log/redis_6379.log      定义日志文件
+maxclients  10000     并发连接数量
+dir  /var/lib/redis/6379              数据库目录
+内存清除策略
+noeviction        不删除,写满时报错
+volatile-lru      清除最近少用的(针对设置了TTL的key)
+allkeys-lru       清除最近少用的(针对所有key)
+allkeys-lfu       从所有key中清除使用频率最少的key
+volatile-lfu      从所有配置了过期时间的key中清除使用频率最少的key
+volatile-random   在设置了TTL的key里随机移除
+allkeys-random    所有key中随机移除
+volatile-ttl (minor TTL) 移除最近过期的key
+优化设置
+maxmemory         最大内存
+maxmemory-policy  定义使用策略
+maxmemory-samples 选取key模板个数(针对lru和ttl策略)
+
+设置连接密码和端口
+vim /etc/redis/6379.conf      修改配置文件
+requirepass  123456           密码改为123456
+bind  192.168.4.50            修改IP地址
+port  6350                    改变端口
+/etc/init.d/redis_6379   restart    重启服务(更改端口后,此脚本操作不可用,杀死进程或shutdown停止服务)
+redis-cli -h 192.168.4.50 -p 6350 -a 123456     密码连接数据库(或进入库后 auth 123456)
+redis-cli -h 192.168.4.50 -p 6350 -a 123456  shutdown  停止服务
+vim  +43 /etc/init.d/redis_6379    修改启动脚本,可以提供端口使用
+$CLIEXEC -h 192.168.4.50 -p 6350 -a 123456 $REDISPORT shutdown     添加端口,IP,密码信息
+/etc/init.d/redis_6379   restart    修改后的启动脚本可以使用
+
+部署LNMP+redis
+LNMP的搭建请查看Nginx的内容
+配置PHP支持redis
+yum -y install php php-devel automake autoconf    安装依赖包
+tar -xf php-redis-2.2.4.tar.gz   解包
+cd phpredis-2.2.4/               进入目录
+phpize                           生成配置文件php-config及configure命令
+./configure --with-php-config=/usr/bin/php-config   检查环境,添加模块
+make && make install             编译安装
+vim +728 /etc/php.ini            修改配置文件
+728:extension_dir = "/usr/lib64/php/modules/"   模块目录
+730:extension = "redis.so"                      模块名
+systemctl restart php-fpm        重启服务
+php -m | grep -i redis           检查是否支持模块
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
