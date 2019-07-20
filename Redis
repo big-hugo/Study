@@ -83,14 +83,32 @@ phpize                           生成配置文件php-config及configure命令
 make && make install             编译安装
 vim +728 /etc/php.ini            修改配置文件
 728:extension_dir = "/usr/lib64/php/modules/"   模块目录
-730:extension = "redis.so"                      模块名
+730:extension = "redis.so"       模块名
 systemctl restart php-fpm        重启服务
 php -m | grep -i redis           检查是否支持模块
+vim /usr/local/nginx/html/test.php   编写测试脚本
+<?php
+$redis = new redis();           新建对象
+$redis->connect('数据库IP',端口);
+$redis->auth("密码");            没密码可以不写这一行
+$redis->set('存储变量名','值');   存储key和value
+echo $redis->get('变量名');      输出获取的值
+?>
+curl  127.0.0.1/test.php       访问测试能不能获取值
 
-
-
-
-
+配置redis集群
+6台redis服务器环境搭建
+vim /etc/redis/6379.conf       修改配置文件
+70    bind   IP                改为本机IP
+93    port   自定义端口          修改端口(便于区分)
+815   cluster-enabled yes      开启集群功能
+823   cluster-config-file nodes-6379.conf     定义集群配置文件
+829   cluster-node-timeout 5000               定义连接超时时间毫秒
+/etc/init.d/redis_6379    stop  停止服务
+rm -rf /var/lib/redis/6379/*   删除原有数据
+vim  +43  /etc/init.d/redis_6379              修改启动脚本
+$CLIEXEC -h 本机IP  -p 自定义端口  shutdown
+/etc/init.d/redis_6379    restart             重启服务
 
 
 
