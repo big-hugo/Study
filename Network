@@ -104,18 +104,32 @@ acl*]rule  deny/permit  source  IP   0/any      限制/允许来源IP
 acl*]rule  deny/permit  传输协议  source  来源IP  0/any  destination 目标IP destination-port  eq   服务端口   
 /0/1]traffic-filter inbound/outbount acl 3000    接口选择acl域(进或出)
 
-
 NAT转换
 可以将内网的私有IP地址与公有IP进行转换
 私有IP地址范围  A:10.0.0.0 - 10.255.255.255
               B:172.168.0.0 - 172.31.255.255
               C:192.168.0.0 - 192.168.255.255
+静态NAT转换:一对一转换,双向的,多用于服务器
+接口视图下 nat static global 公有IP inside 接口私有IP
+Easy IP:多对一,单向,出门时生成临时端口号
+acl *         定义ACL号
+rule permit  soure  网段  反掩码   制定ACL表规则 ( rule permit source any 使用acl定义任何内部地址)
+接口视图下 nat  outbount  acl号    把ACL表拉进接口
+
+交换机STP生成树协议功能  
+逻辑上断开环路,防止广播风暴的生成,一般高级交换机自带,傻瓜机没有
+STP enable/disable   开启/关闭功能(默认开启)
+
+VRRP
+将多台路由器虚拟成一个虚拟路由器,实现网关备份
+由主路由器,备份路由器,虚拟路由器组成
+配置三层交换机VRRP
+int vlan *                     进入虚拟vlan
+ip  address  真网关  掩码        配备真网关
+vrrp vrid 1  virtual-ip  虚拟网关       配备虚拟网关
+display  vrrp  brief            查看vrrp状态
+vrrp vrid 1  priority   200     调整优先级,越大越优先
  
-
-
-
-
-
 
 
 
