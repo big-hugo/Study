@@ -113,7 +113,7 @@ vim /etc/redis/6379.conf       修改配置文件
 rm -rf /var/lib/redis/6379/*    删除原有数据,必要操作
 vim  +43  /etc/init.d/redis_6379              修改启动脚本
 $CLIEXEC -h 本机IP  -p 自定义端口  shutdown
-/etc/init.d/redis_6379    start               重动服务
+/etc/init.d/redis_6379    start               重启服务
 部署ruby脚本运行环境(在其中一台机上做)
 yum -y install ruby             安装ruby
 rpm -qf /usr/bin/gem            安装gem
@@ -129,17 +129,36 @@ redis-trib.rb  info 192.168.4.52:6352         查看集群主从配置(集群中
 redis-trib.rb  check 192.168.4.52:6352        查看集群详细主从信息(集群中任意IP和端口)
 redis-cli -c -h 集群中任意IP -p 对应端口         客户端连接redis集群(变量名和crc16算法作hash计算再与%16384取余得到一个数) 
 >cluser info                    查看自己在集群中的信息
+redis-trib.rb  rebalance  集群控制IP:端口       重新平均分配哈希值
 
-redies集群添加主机
+redis集群添加主机
 redis-trib.rb  add-node 新增服务器IP:端口  集群控制服务器IP:端口   添加新的主服务器
-redis-trib.rb  reshard 集群控制服务器IP:端口                     重新分片哈希槽
+redis-trib.rb  reshard 集群控制服务器IP:端口                     重新分配哈希槽
 How many slots do you want to move (from 1 to 16384)? 4096     (总数/主库主机数 即 16384/4)
 What is the receiving node ID?                                新增主机的集群ID(用info可查看)
 Source node #1:all                                            所有重新分配
-Do you want to proceed with the proposed reshard plan(yes/no)? yes   确认
+Do you want to proceed with the proposed reshard plan(yes/no)? yes   确认以上分配
 redis-trib.rb add-node --slave [--master-id id值 ] 新增主机IP:端口 集群主机IP:端口  添加新的从服务器(不指定主库ID会添加到从库最少的主库)
 
+redis集群移除主机
+redis-trib.rb  del-node  集群控制服务器IP:端口  从服务器ID        移除从服务器
+移除主服务器
+redis-trib.rb reshard 集群控制IP:端口            重新分配哈希槽
+How many slots do you want to move (from 1 to 16384)? 4096         把所拥有的哈希槽分配出来
+What is the receiving node ID?                                     输入把哈希槽分配给哪台服务器的ID
+Source node #1:                                                    输出被分配的服务器ID
+Source node #2:done                                                输入done操作完成
+Do you want to proceed with the proposed reshard plan(yes/no)? yes   确认以上分配
+redis-trib.rb  del-node  集群控制服务器IP:端口  主服务器ID        移除主服务器
 
+被移除的主机,再添加时会失败,需作以下操作,才可再加入
+/etc/init.d/redis_6379 start               被移除的主机启动服务
+redis-cli -h 自身IP -p 端口                 连接到自己的数据库
+>cluster reset                             清除集群信息
+
+redis-trib.rb脚本常用选项
+create   创建集群      reshard    重新分片         del-node   删除主机       add-node  --slave   添加从主机
+check    检查集群      rebalance  重新平均分片     add-node    添加主机
 
 
 
