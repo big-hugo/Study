@@ -160,7 +160,20 @@ redis-trib.rb脚本常用选项
 create   创建集群      reshard    重新分片         del-node   删除主机       add-node  --slave   添加从主机
 check    检查集群      rebalance  重新平均分片     add-node    添加主机
 
-
+redis主从复制
+可配置主从,主从从,一主多从
+需要主从库都不在集群中(配置文件中关闭集群功能,重启)
+>info replication               查看复制信息,默认都是主服务器
+>slaveof 主库IP 主库端口          指定要从属的主库(临时配置)
+vim /etc/redis/6379.conf        修改配置文件(永久配置)
+282  slaveof 主库IP 主库端口      添加指定要从属的主库
+>slaveof no one                 退出slave模式(临时)
+vim /etc/redis/6379.conf        修改配置文件(永久配置)
+282  #slaveof 192.168.4.57 6357   注释要从属的主库信息
+连接加密主库
+vim /etc/redis/6379.conf          修改配置文件
+289  masterauth 主库密码           添加主库密码信息
+/etc/init.d/redis_6379 restart    重启服务
 
 
 
