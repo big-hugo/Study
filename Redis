@@ -96,7 +96,12 @@ echo $redis->get('变量名');      输出获取的值
 ?>
 curl  127.0.0.1/test.php       访问测试能不能获取值
 
+redis集群的高可用功能
+把主服务器的redis服务停止,对应的从服务器会自动升级成主服务器。
+宕机的主服务器redis服务运行后,自动作当前主库的从库并自动同步宕机期间产生的新数据。
+
 配置redis集群
+默认选三台机器作主服务器
 6台redis服务器环境搭建
 vim /etc/redis/6379.conf       修改配置文件
 70    bind   IP                改为本机IP
@@ -105,19 +110,34 @@ vim /etc/redis/6379.conf       修改配置文件
 823   cluster-config-file nodes-6379.conf     定义集群配置文件
 829   cluster-node-timeout 5000               定义连接超时时间毫秒
 /etc/init.d/redis_6379    stop  停止服务
-rm -rf /var/lib/redis/6379/*   删除原有数据
+rm -rf /var/lib/redis/6379/*    删除原有数据,必要操作
 vim  +43  /etc/init.d/redis_6379              修改启动脚本
 $CLIEXEC -h 本机IP  -p 自定义端口  shutdown
-/etc/init.d/redis_6379    restart             重启服务
+/etc/init.d/redis_6379    start               重动服务
+部署ruby脚本运行环境(在其中一台机上做)
+yum -y install ruby             安装ruby
+rpm -qf /usr/bin/gem            安装gem
+gem install  redis-3.2.1.gem    安装gem包
+mkdir /root/bin                 创建命令检索目录
+cd  redis-4.0.8/src/            进入安装目录
+cp redis-trib.rb /root/bin/     复制管理集群脚本
+chmod +x /root/bin/redis-trib.rb    给操作权限
+redis-trib.rb help              查看帮助命令
+redis-trib.rb create --replicas 1 192.168.4.51:6351 ip:端口 ...    创建redis集群(分配储存池)
+*(如果启动不成功rm -rf /var/lib/redis/6379/nodes-6379.conf删除集群配置文件,重启redis服务)
+redis-trib.rb  info 192.168.4.52:6352         查看集群主从配置(集群中任意IP和端口)
+redis-trib.rb  check 192.168.4.52:6352        查看集群详细主从信息(集群中任意IP和端口)
+redis-cli -c -h 集群中任意IP -p 对应端口         客户端连接redis集群(变量名和crc16算法作hash计算再与%16384取余得到一个数) 
+>cluser info                    查看自己在集群中的信息
 
-
-
-
-
-
-
-
-
+redies集群添加主机
+redis-trib.rb  add-node 新增服务器IP:端口  集群控制服务器IP:端口   添加新的主服务器
+redis-trib.rb  reshard 集群控制服务器IP:端口                     重新分片哈希槽
+How many slots do you want to move (from 1 to 16384)? 4096     (总数/主库主机数 即 16384/4)
+What is the receiving node ID?                                新增主机的集群ID(用info可查看)
+Source node #1:all                                            所有重新分配
+Do you want to proceed with the proposed reshard plan(yes/no)? yes   确认
+redis-trib.rb add-node --slave [--master-id id值 ] 新增主机IP:端口 集群主机IP:端口  添加新的从服务器(不指定主库ID会添加到从库最少的主库)
 
 
 
