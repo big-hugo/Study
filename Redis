@@ -39,13 +39,15 @@ NETWORK网络  GENERAL常规  SNAPSHOTTING快照  REPLICATION复制  SECURITY安
  1gb => 1024*1024*1024 bytes
  units are case insensitive so 1GB 1Gb 1gB are all the same.
 常用配置
-port 6379             端口
-bind 127.0.0.1        ip地址
-daemonize yes         守护进程方式运行
-datebases 16          数据库个数
-logfile  /var/log/redis_6379.log      定义日志文件
-maxclients  10000     并发连接数量
-dir  /var/lib/redis/6379              数据库目录
+93  port 6379             端口
+70  bind 127.0.0.1        ip地址
+137 daemonize yes         守护进程方式运行
+172 logfile /var/log/redis_6379.log   定义日志文件
+187 datebases 16          数据库个数
+264 dir /var/lib/redis/6379           库文件所在目录
+501 requirepass 123456                连接密码
+533 maxclients  10000     并发连接数量
+
 内存清除策略
 noeviction        不删除,写满时报错
 volatile-lru      清除最近少用的(针对设置了TTL的key)
@@ -63,19 +65,19 @@ maxmemory-samples 选取key模板个数(针对lru和ttl策略)
 设置连接密码和端口
 vim /etc/redis/6379.conf      修改配置文件
 requirepass  123456           密码改为123456
-bind  192.168.4.50            修改IP地址
-port  6350                    改变端口
+70 bind  192.168.4.50         修改IP地址
+93 port  6350                 改变端口
 /etc/init.d/redis_6379   restart    重启服务(更改端口后,此脚本操作不可用,杀死进程或shutdown停止服务)
-redis-cli -h 192.168.4.50 -p 6350 -a 123456     密码连接数据库(或进入库后 auth 123456)
-redis-cli -h 192.168.4.50 -p 6350 -a 123456  shutdown  停止服务
+redis-cli -h 自身IP -p 修改后端口 -a 密码            密码连接数据库(或进入库后 auth 123456)
+redis-cli -h 自身IP -p 修改后端口 -a 密码  shutdown  停止服务
 vim  +43 /etc/init.d/redis_6379    修改启动脚本,可以提供端口使用
-$CLIEXEC -h 192.168.4.50 -p 6350 -a 123456 $REDISPORT shutdown     添加端口,IP,密码信息
+$CLIEXEC -h 192.168.4.50 -p 6350 -a 123456  shutdown     添加端口,IP,密码信息
 /etc/init.d/redis_6379   restart    修改后的启动脚本可以使用
 
 部署LNMP+redis
 LNMP的搭建请查看Nginx的内容
 配置PHP支持redis
-yum -y install php php-devel automake autoconf    安装依赖包
+yum -y install php php-devel automake autoconf gcc  安装依赖包
 tar -xf php-redis-2.2.4.tar.gz   解包
 cd phpredis-2.2.4/               进入目录
 phpize                           生成配置文件php-config及configure命令
@@ -99,7 +101,6 @@ curl  127.0.0.1/test.php       访问测试能不能获取值
 redis集群的高可用功能
 把主服务器的redis服务停止,对应的从服务器会自动升级成主服务器。
 宕机的主服务器redis服务运行后,自动作当前主库的从库并自动同步宕机期间产生的新数据。
-
 配置redis集群
 默认选三台机器作主服务器
 6台redis服务器环境搭建
@@ -116,12 +117,12 @@ $CLIEXEC -h 本机IP  -p 自定义端口  shutdown
 /etc/init.d/redis_6379    start               重启服务
 部署ruby脚本运行环境(在其中一台机上做)
 yum -y install ruby             安装ruby
-rpm -qf /usr/bin/gem            安装gem
+rpm -qf /usr/bin/gem            检查gem
 gem install  redis-3.2.1.gem    安装gem包
 mkdir /root/bin                 创建命令检索目录
 cd  redis-4.0.8/src/            进入安装目录
 cp redis-trib.rb /root/bin/     复制管理集群脚本
-chmod +x /root/bin/redis-trib.rb    给操作权限
+chmod +x /root/bin/redis-trib.rb    给操作权限.0
 redis-trib.rb help              查看帮助命令
 redis-trib.rb create --replicas 1 192.168.4.51:6351 ip:端口 ...    创建redis集群(分配储存池)
 *(如果启动不成功rm -rf /var/lib/redis/6379/nodes-6379.conf删除集群配置文件,重启redis服务)
