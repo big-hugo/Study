@@ -15,18 +15,28 @@ redis-cli                             连接本机redis服务
 
 redis基本操作(key-values存储结构)
 keys *              查看所有变量名(*匹配任意多个字符  ?匹配单个字符)
-set  变量  值        定义变量(字符类型)        mset  变量  值 ...   定义多个变量
+set  变量  值        定义变量(默认string类型)   mset  变量  值 ...   定义多个变量
 get  变量            获取变量值               mget   变量 ...      获取多个变量值
 del  变量            删除变量                select  0-15        切换库(默认0-15库)
 exists   变量        查看变量是否存在          type   变量          查看变量类型(默认string)
 setrange 变量  始位置  字符    字符串替换      strlen  变量         返回变量的字符个数
-append   变量  字符           字符串最佳
-ttl  变量            查看key生存时间(-1永久,-2过期)
+getrange 变量  始位置  末位置  字符串截取      append   变量  字符           字符串追加
+decr     变量       变量减一(用于数字)         incr   变量         变量加一(用于数字) 
+decrby/incrby   变量   步长   设置变量递减/递增值(incrbyfloat可设置小数步长)
+ttl  变量            查看key生存时间(-1永久,-2过期)   
 expire   变量  秒数   设置变量有效时间(单位秒)
 move 变量 库号        移动变量到指定库
 flushdb              删除所在库所有变量        flushall            删除所有key 
 save                保存变量到硬盘(阻塞存盘)    bgsave             不阻塞存盘     
 shutdown            停止服务                  exit                退出
+setbit  变量  位数  值   设置bit变量(值只能时0或1)    bitcount   变量    计算bit变量设置为1的位个数(多用于计算用户上线天数)
+lpush  变量  值 值...    定义list类型的变量          rpush   变量   值   从list后面插入值
+lrange  变量 始位 末位   获取list变量的值            rpop    变量       移除末尾第一个元素
+lpop   变量             移除list的第一个元素         llen    变量       返回list的长度
+lindex  变量  位置       返回lindex中位置的值        lset    变量  位置  新值    修改list对应位置的值
+hset   变量  列名  值... 定义hash变量(hmset定义多个)    hget    变量  列    获取hash对面列的值(hmget取多个)
+hgetall  变量           返回hash表中所有列名和值      hvals   变量       返回hash表中所有值
+hdel   变量   列        删除hash表中的列
 
 配置文件解析
 vim /etc/redis/6379.conf
