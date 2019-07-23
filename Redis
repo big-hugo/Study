@@ -18,13 +18,15 @@ keys *              查看所有变量名(*匹配任意多个字符  ?匹配单�
 set  变量  值        定义变量(字符类型)        mset  变量  值 ...   定义多个变量
 get  变量            获取变量值               mget   变量 ...      获取多个变量值
 del  变量            删除变量                select  0-15        切换库(默认0-15库)
-exists   变量        查看变量是否存在          type   变量          查看变量类型
+exists   变量        查看变量是否存在          type   变量          查看变量类型(默认string)
+setrange 变量  始位置  字符    字符串替换      strlen  变量         返回变量的字符个数
+append   变量  字符           字符串最佳
 ttl  变量            查看key生存时间(-1永久,-2过期)
 expire   变量  秒数   设置变量有效时间(单位秒)
 move 变量 库号        移动变量到指定库
 flushdb              删除所在库所有变量        flushall            删除所有key 
-save                 保存变量到硬盘           shutdown            停止服务
-exit                退出
+save                保存变量到硬盘(阻塞存盘)    bgsave             不阻塞存盘     
+shutdown            停止服务                  exit                退出
 
 配置文件解析
 vim /etc/redis/6379.conf
@@ -175,6 +177,60 @@ vim /etc/redis/6379.conf        修改配置文件(永久配置)
 vim /etc/redis/6379.conf          修改配置文件
 289  masterauth 主库密码           添加主库密码信息
 /etc/init.d/redis_6379 restart    重启服务
+
+哨兵服务
+slave监视master服务器,发现master宕机后从服务器升级成主服务器
+vim  /etc/sentinel.conf         新建配置文件
+  bind 0.0.0.0                自身服务地址(任何)
+  sentinel monitor 主库主机名 主库IP 主库端口 票数     指定主库信息(票数=从库数)
+  sentinel auth-pass 主库主机名 主库密码              连接主库的密码
+redis-sentinel /etc/sentinel.conf     启动哨兵服务
+
+持久化
+redis服务把内存里的数据保存到硬盘的方式,方式有RDB,AOF
+RDB(Redis DataBase),持久化默认方式,按照指定时间间隔将内存数据集快照写入硬盘,快照术语叫Snapshot,恢复时,将快照文件读入内存
+优点:适合大规模数据恢复,数据完整性要求不高,速度快              缺点:意外宕机时,丢失最后一次持久化的所有数据
+数据从内存保存到硬盘的默认频率       save  900  1         15分钟内有1个key改变就保存
+                                save  300  10        5分钟内有10个key改变就保存
+                                save  60   10000     1分钟内有10000个key改变就保存
+/etc/init.d/redis_6379   stop       停止两部机的服务(不停止备份的文件没有数据)
+scp /var/lib/redis/6379/dump.rdb   用户@目标ip:/var/lib/redis/6379/dump.rdb   复制映射文件到目标数据库目录下
+/etc/init.d/redis_6379   start      启动服务即可恢复数据
+AOF(Append Only File),追加方式记录写操作的文件,默认没启用,启用后优先级大于RDB,可用cat查看文件内容
+优点:灵活设置持久化方式,意外宕机丢失仅一秒数据                缺点:日志文件体积大于RDB,备份同步时会闭RDB慢
+AOF文件记录操作方式             appendfsync   always         实时记录,并完成磁盘同步
+                             appendfsync    everysec      每秒记录,并完成磁盘同步
+                             appendfsync    no            写入aof,不执行磁盘同步
+config set appendonly yes     启用AOF
+config rewrite                写进配置文件
+save                          保存当前操作
+/etc/init.d/redis_6379   stop       停止两部机的服务(不停止备份的文件没有数据)
+scp /var/lib/redis/6379/appendonly.aof  用户@目标ip:/var/lib/redis/6379/appendonly.aof   复制aof文件到目标数据库目录下
+vim /etc/redis/6379.conf      修改配置文件
+appendonly  yes               备份机启用aof
+/etc/init.d/redis_6379   start      开启两部机的服务
+AOF日志文件重写机制
+744 auto-aof-rewrite-percentage 100    达到两倍(即100%)再次重写
+745 auto-aof-rewrite-min-size 64mb     首次重写触发值
+redis-check-aof --fix /var/lib/redis/6379/appendonly.aof  修复AOF文件到最后一次正确操作
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
