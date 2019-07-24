@@ -1,0 +1,86 @@
+监控的目的
+包容包括吞吐量,反应时间,使用率等提前发现问题,进行服务器性能提前调整,找出系统瓶颈
+公开数据:WEB,FTP,SSH,数据库等应用服务,TCP或UDP端口
+私有数据:CPU,内存,网卡,磁盘,用户,进程等信息
+系统监控命令
+ps uptime free swapon -s       iostat查看磁盘读写速度
+df -h  ifconfig  netstat或ss   traceroute路由追踪
+
+监控软件
+开源软件有:Cacti强大绘图能力,Nagios强大的状态检查和报警机制,Zabbix多种监控机制,支持分布式监控
+
+Zabbix
+监控服务器通过SNMP或Agen采集数据,数据可写入MySql,Oracle中,使用LNMP实现web前端管理
+被监控主机需要安装Agent,网络设备一般支持SNMP
+部署zabbix服务器
+搭建LNMP环境
+yum -y install gcc pcre-devel zlib-devel openssl-devel php php-mysql mariadb mariadb-devel mariadb-server php-fpm 
+tar -xf nginx-1.12.tar.gz
+cd  nginx-1.12
+./configure  --with-http_ssl_module
+make && make install
+安装并配置好后启动各个服务
+<?php
+$i=35;              编写测试页面测试功能
+echo $i;
+?>
+安装源码zabbix
+yum -y install net-snmp-devel curl-devel libevent-devel   安装依赖包
+tar -xf zabbix-3.4.4.tar.gz   解包
+cd zabbix-3.4.4/              进入目录
+./configure --enable-server --enable-proxy --enable-agent --with-mysql=/usr/bin/mysql_config --with-net-snmp --with-libcurl      检查,添加模块
+make install                  安装
+mysql                         进入数据库
+> create database zabbix character set utf8;      创建zabbix数据库
+> grant all on zabbix.* to zabbix@'localhost' identified by 'zabbix';       授权zabbix用户
+mysql -uzabbix -pzabbix zabbix < zabbix-3.4.4/database/mysql/schema.sql     导入库文件(注意顺序)
+mysql -uzabbix -pzabbix zabbix < zabbix-3.4.4/database/mysql/images.sql      
+mysql -uzabbix -pzabbix zabbix < zabbix-3.4.4/database/mysql/data.sql
+cd zabbix-3.4.4/frontends/php/               进入zabbix网页目录
+cp -a * /usr/local/nginx/html/               复制网页到nginx网页目录(-a复制权限)
+chmod -R 777 /usr/local/nginx/html/*         递归给权限nginx网页目录
+vim   /etc/php.ini                           修改配置文件为zabbix页面提供环境
+384 max_execution_time = 300                 最大执行时间(秒)
+394 max_input_time = 300                     服务器接收数据的时间限制
+672 post_max_size = 16M                      post数据最大容量
+878 date.timezone = Asia/Shanghai            设置时区
+vim /usr/\local/nginx/conf/nginx.conf        修改配置文件为zabbix页面提供环境
+http{   fastcgi_buffers 8 16k;               缓存php生成的页面内容 8个16K
+        fastcgi_buffer_size 32k;             缓存php产生的头部信息
+        fastcgi_connect_timeout 300;         连接PHP的超时时间
+        fastcgi_send_timeout 300;            发送请求的超时时间
+        fastcgi_read_timeout 300;            读取请求的超时时间
+yum -y install php-gd php-xml php-ldap php-bcmath php-mbstring    安装依赖软件
+systemctl  restart php-fpm                   重启php-fpm服务
+/usr/local/nginx/sbin/nginx -s stop          
+/usr/local/nginx/sbin/nginx                  重启nginx服务
+现在可以访问自身zabbix网页 firefox 127.0.0.1/index.php 进行连接配置
+vim /usr/local/nginx/html/conf/zabbix.conf.php  可以在此文件查看或修改配置信息
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
