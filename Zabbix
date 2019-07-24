@@ -3,19 +3,19 @@
 公开数据:WEB,FTP,SSH,数据库等应用服务,TCP或UDP端口
 私有数据:CPU,内存,网卡,磁盘,用户,进程等信息
 系统监控命令
-ps 查看CPU信息    uptime 查看网络连接信息   free 查看内存信息 
-swapon -s 查看交换分区信息       iostat 查看磁盘读写速度   df -h 查看磁盘信息 
+ps 查看进程信息    uptime 查看CPU信息   free 查看内存信息 
+swapon -s 查看交换分区信息       iostat 查看磁盘读写速度   df -h 查看挂载信息 
 ifconfig 查看网卡信息   netstat或ss 查看端口信息   traceroute 路由追踪
 
 监控软件
 开源软件有:Cacti强大绘图能力,Nagios强大的状态检查和报警机制,Zabbix多种监控机制,支持分布式监控
 
 Zabbix
-监控服务器通过SNMP或Agen采集数据,数据可写入MySql,Oracle中,使用LNMP实现web前端管理
+监控服务器通过SNMP或Agent采集数据,数据可写入MySql,Oracle中,使用LNMP实现web前端管理
 被监控主机需要安装Agent,网络设备一般支持SNMP
 部署zabbix服务器
 搭建LNMP环境
-yum -y install gcc pcre-devel zlib-devel openssl-devel php php-mysql mariadb mariadb-devel mariadb-server php-fpm 
+yum -y install gcc pcre-devel zlib-devel openssl-devel php php-mysql php-fpm mariadb mariadb-devel mariadb-server 
 tar -xf nginx-1.12.tar.gz
 cd  nginx-1.12
 ./configure  --with-http_ssl_module
@@ -29,7 +29,7 @@ echo $i;
 yum -y install net-snmp-devel curl-devel libevent-devel   安装依赖包
 tar -xf zabbix-3.4.4.tar.gz   解包
 cd zabbix-3.4.4/              进入目录
-./configure --enable-server --enable-proxy --enable-agent --with-mysql=/usr/bin/mysql_config --with-net-snmp --with-libcurl      检查,添加模块
+./configure --enable-server --enable-proxy --enable-agent --with-mysql=/usr/bin/mysql_config --with-net-snmp --with-libcurl   检测,添加模块
 make install                  安装
 mysql                         进入数据库
 > create database zabbix character set utf8;      创建zabbix数据库
@@ -56,6 +56,7 @@ systemctl  restart php-fpm                   重启php-fpm服务
 /usr/local/nginx/sbin/nginx -s stop          
 /usr/local/nginx/sbin/nginx                  重启nginx服务
 现在可以访问自身zabbix网页 firefox 127.0.0.1/index.php 进行连接配置
+登录账号为admin  密码zabbix;点击右上角个人配置,可修改密码和切换语言
 vim /usr/local/nginx/html/conf/zabbix.conf.php  可以在此文件查看或修改配置信息
 $DB['TYPE']     = 'MYSQL';                  $ZBX_SERVER      = 'localhost';
 $DB['SERVER']   = 'localhost';              $ZBX_SERVER_PORT = '10051';
@@ -63,11 +64,40 @@ $DB['PORT']     = '0';                      $ZBX_SERVER_NAME = '自定义';
 $DB['DATABASE'] = 'zabbix';
 $DB['USER']     = 'zabbix';
 $DB['PASSWORD'] = 'zabbix';
-
-
-
-
-
+启动zabbix监控服务
+vim /usr/local/etc/zabbix_server.conf       修改配置文件
+38 LogFile=/tmp/zabbix_server.log           日志位置                   
+85  DBHost=localhost                        数据库主机
+95  DBName=zabbix                           数据库名称
+111 DBUser=zabbix                           数据库连接账户
+119 DBPassword=zabbix                       数据库连接密码
+useradd zabbix                              系统添加zabbix用户
+zabbix_server                               启动服务(端口10051)
+配置被监控端(客户端)
+  yum -y install gcc pcre-devel             安装依赖包 
+  tar -xf zabbix-3.4.4.tar.gz               解开源码包
+  cd zabbix-3.4.4/                          进入目录
+  ./configure --enable-agent                检查,添加模块
+  make install                              安装
+vim /usr/local/etc/zabbix_agentd.conf       修改配置文件
+30 LogFile=/tmp/zabbix_agentd.log           定义日志文件
+93  Server=127.0.0.1, 192.168.25            允许服务地址列表
+134 ServerActive=192.168.2.5:10051          监控服务器ip地址
+useradd zabbix                              系统添加zabbix用户
+zabbix_agentd                               启动服务(端口10050)                                            
+配置监控端(服务器)
+firefox 127.0.0.1/index.php                 打开zabbix页面
+配置(头顶栏)->主机->创建主机(配置主机,监控模板)   填入信息创建主机
+监控中(头顶栏)->最新数据->选择主机              查看监控信息
+自定义监控
+vim /usr/local/etc/zabbix_agentd.conf
+265 Include=/usr/local/etc/zabbix_agentd.conf.d/*.conf         定义自定义监控命令文件路径
+280  UnsafeUserParameters=0                 开启自定义监控命令功能
+vim /usr/local/etc/zabbix_agentd.conf.d/自定义.conf               新建自定义监控命令文件
+UserParameter=自定义名称,命令                  自定义命令语法格式
+killall zabbix_agentd                        杀死进程
+zabbix_agentd                                启动进程
+zabbix_get -s 
 
 
 
