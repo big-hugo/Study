@@ -3,8 +3,9 @@
 公开数据:WEB,FTP,SSH,数据库等应用服务,TCP或UDP端口
 私有数据:CPU,内存,网卡,磁盘,用户,进程等信息
 系统监控命令
-ps uptime free swapon -s       iostat查看磁盘读写速度
-df -h  ifconfig  netstat或ss   traceroute路由追踪
+ps 查看CPU信息    uptime 查看网络连接信息   free 查看内存信息 
+swapon -s 查看交换分区信息       iostat 查看磁盘读写速度   df -h 查看磁盘信息 
+ifconfig 查看网卡信息   netstat或ss 查看端口信息   traceroute 路由追踪
 
 监控软件
 开源软件有:Cacti强大绘图能力,Nagios强大的状态检查和报警机制,Zabbix多种监控机制,支持分布式监控
@@ -56,6 +57,13 @@ systemctl  restart php-fpm                   重启php-fpm服务
 /usr/local/nginx/sbin/nginx                  重启nginx服务
 现在可以访问自身zabbix网页 firefox 127.0.0.1/index.php 进行连接配置
 vim /usr/local/nginx/html/conf/zabbix.conf.php  可以在此文件查看或修改配置信息
+$DB['TYPE']     = 'MYSQL';                  $ZBX_SERVER      = 'localhost';
+$DB['SERVER']   = 'localhost';              $ZBX_SERVER_PORT = '10051';
+$DB['PORT']     = '0';                      $ZBX_SERVER_NAME = '自定义';
+$DB['DATABASE'] = 'zabbix';
+$DB['USER']     = 'zabbix';
+$DB['PASSWORD'] = 'zabbix';
+
 
 
 
