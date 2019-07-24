@@ -97,7 +97,7 @@ vim /usr/local/etc/zabbix_agentd.conf.d/自定义.conf               新建自�
 UserParameter=自定义名称,命令                  自定义命令语法格式
 killall zabbix_agentd                        杀死进程
 zabbix_agentd                                启动进程
-zabbix_get -s 
+zabbix_get -s 127.0.0.1 -p 10050 -k 自定义名称       测试自定义命令是否可以执行
 
 
 
