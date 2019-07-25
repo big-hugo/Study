@@ -81,7 +81,7 @@ zabbix_server                               启动服务(端口10051)
   make install                              安装
 vim /usr/local/etc/zabbix_agentd.conf       修改配置文件
 30 LogFile=/tmp/zabbix_agentd.log           定义日志文件
-93  Server=127.0.0.1, 192.168.25            允许服务地址列表
+93  Server=127.0.0.1, 192.168.2.5           允许服务地址列表
 134 ServerActive=192.168.2.5:10051          监控服务器ip地址
 useradd zabbix                              系统添加zabbix用户
 zabbix_agentd                               启动服务(端口10050)                                            
@@ -90,7 +90,7 @@ firefox 127.0.0.1/index.php                 打开zabbix页面
 配置(头顶栏)->主机->创建主机(配置主机,监控模板)   填入信息创建主机
 监控中(头顶栏)->最新数据->选择主机              查看监控信息
 自定义监控
-vim /usr/local/etc/zabbix_agentd.conf
+vim /usr/local/etc/zabbix_agentd.conf       在被监控机上操作
 265 Include=/usr/local/etc/zabbix_agentd.conf.d/*.conf         定义自定义监控命令文件路径
 280  UnsafeUserParameters=0                 开启自定义监控命令功能
 vim /usr/local/etc/zabbix_agentd.conf.d/自定义.conf               新建自定义监控命令文件
@@ -98,8 +98,11 @@ UserParameter=自定义名称,命令                  自定义命令语法格�
 killall zabbix_agentd                        杀死进程
 zabbix_agentd                                启动进程
 zabbix_get -s 127.0.0.1 -p 10050 -k 自定义名称       测试自定义命令是否可以执行
-
-
+模板->创建模板->创建应用集->创建监控项(Key必须与配置文件一致)->模板关联主机
+zabbix监控报警
+yum -y install postfix mailx                 服务器安装邮件服务后启动postfix
+在对应的监控模板定义触发器,管理->报警媒介类型->Email(配置发件人,发件服务器,主机名)  
+管理->用户->报警媒介->添加收件人     配置->动作->创建动作(选择触发器)->操作(收件人为标题,添加操作)
 
 
 
