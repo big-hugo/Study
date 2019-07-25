@@ -1,3 +1,4 @@
+#!/bin/bash
 Shell脚本
 /etc/shells  可查看本机编译器(可安装)
 sh/bash或直接执行  *.sh    打开一个subshell去读取,开启子进程,执行完消失
