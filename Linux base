@@ -6,6 +6,61 @@ which java    查看命令编译路径
 ps -C java    查看进程是否开启
 echo > /var/log/wtmp或btmp     清除用户登录信息
 
+进程管理
+树型结构,父进程与子进程,僵尸进程,孤儿进程
+pstree [选项] PID或进程名  查看进程数     -a 显示完整命令行  -p 列出对应PID 
+ps aux          查看所有进程信息
+ps aux | wc -l  查看进程数量
+top [-d 刷新秒数] [-U 用户名]  进程动态排位
+pgrep  [-l 模糊进程名] [-U 指定用户进程] [-x 精确进程名]   检索进程
+命令  &        后台启动命令
+ctrl+z        暂停并转入后台
+ctrl+c        结束进程
+jobs          查看后台任务列表
+fg  后台编号   将后台进程拉进前台
+bg  后台编号   激活后台挂起的任务
+kill [-9] 进程号      杀死进程
+kill [-9] 后台编号     杀死进程
+killall [-9] 进程名    杀死进程
+killall [-9] -u 用户名   杀死用户的所有进程  
+systemctl控制,是内核引导后第一个进程(PID=1),掌控linux运行服务资源组合
+systemd上帝进程,配置目录/etc/systemd/system
+RHEL6运行级别:init 0 关机    init 5 图形界面
+RHEL7运行模式
+systemctl  isolate  multi-user.target    字符模式切换
+systemctl  isolate  graphical.target     切换图形模式
+systemctl  set-default  graphical.target    默认开机图形模式
+systemctl  get-default    查看默认开机模式
+
+日志管理
+由系统服务rsyslog统一管理和记录,日志消息等级0~7,数值越小越紧急
+/var/log/messages     记录内核,各种服务           /var/log/maillog      记录邮件收发
+/var/log/dmesg        记录系统启动过程            /var/log/secure       记录访问限制相关
+/var/log/cron         记录cron计划任务
+user      查看已登录用户信息
+who       查看已登录用户信息
+w         查看已登录用户信息
+last      查看登录成功用户记录
+lastb     查看登录失败用户记录
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
