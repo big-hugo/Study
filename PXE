@@ -1,0 +1,63 @@
+PXE装机
+需要服务器有DHCP:分配ip,指定启动文件位置
+tftp:提供引导程序下载
+http:提供yum源
+
+服务端配置
+yum -y install dhcp         安装dhcp
+vim /etc/dhcp/dhcp.conf     配置dhcp
+subnet  192.168.4.0 netmask 255.255.255.0 {     分配网段
+        range  192.168.4.10 192.168.4.200;      分配ip地址范围
+        option  domain-name-servers  192.168.4.7;   分配DNS地址
+        option routers  192.168.4.254;              分配网关地址
+        next-server  192.168.4.7;               指定启动文件位置
+        filename  "pxelinux.0";                 指定启动文件名
+systemctl  restart  dhcpd  &&  systemctl  enable  dhcpd     启动服务并开机自启
+yum -y install tftp-server  syslinux    安装软件
+cp  /usr/share/syslinux/pxelinux.0  /var/lib/tftpboot/     
+mount /dev/cdroom   /mnt     挂载(或挂载后复制)安装系统到/mnt下
+mkdir  /var/lib/tftpboot/pxelinux.cfg   
+cp  /mnt/isolinux/isolinux.cfg  /var/lib/tftpboot/pxelinux.cfg/default
+cp  /mnt/isolinux/vesamenu.c32 /mnt/isolinux/splash.png /mnt/isolinux/vmlinuz /mnt/isolinux/initrd.img  /var/lib/tftpboot
+vim  /var/lib/tftpboot/pxelinux.cfg/default       调整启动参数
+default vesamenu.c32                              默认交给图形模块处理
+timeout 600                                       选择限时为60秒（单位1/10秒)
+menu backgroud splash.png                         背景图
+menu title  自定义                                 启动菜单标题信息
+menu  default                                     读秒后默认选项
+kernel vmlinuz                                    指定启动内核
+append initrd=initrd.img                          指定驱动程序
+systemctl  restart  dhcpd       重启启动dhcpd服务
+systemctl  restart  tftp &&  systemctl  enable  tftp     启动服务并开机自启
+yum -y install httpd        安装httpd
+mkdir  /var/www/html/centos     
+mount  镜像   /var/www/html/centos  
+systemctl  restart  httpd &&  systemctl  enable  httpd     启动服务并开机自启
+yum -y install system-config-kickstart      安装软件,部署无人值守安装,生成应答文件
+vim  /etc/yum.repos.d/*.reop      把服务器yum标识改为[development]
+LANG= system-config-kickstart     打开配置界面
+安装包选system->Base
+保存生成ks.cfg复制到/var/www/html/
+vim  /var/lib/tftpboot/pxelinux.cfg/default       调整启动参数
+65 append ...img  ks=http://服务器IP/ks.cfg        指定应答文件
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
