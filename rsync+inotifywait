@@ -1,0 +1,27 @@
+rsync同步操作
+只传输变化过的数据
+格式:  rsync  [选项]  源  目标  
+-n 测试同步,不修改  --delete 删除多余文档   -a 归档模式
+-v 显示详细   -z 传输过程中压缩/解压     黄金组合:-avz
+rsync   [...]   用户@IP:远程目录   本地目录     下载
+rsync   [...]   本地目录   用户@IP:远程目录     上传
+
+inotify-tools监控目录内容变化
+tar  -xf  inotify-tools-3.13.tar.gz  -C  /usr/src/  解压源码包
+cd  /usr/src/inotify-tools-3.13/
+./configure
+make && make install            安装
+格式: inotifywait [选项] 目标文件夹
+-m 持续监控  -r 递归监控  -q 减少屏幕输出信息  -e 监控指定事件
+inotifywait  -mrq  -e  create,modify,move,attrib,delete /opt &  监控/opt目录指定事件,后台执行
+
+自动监控同步脚本
+ssh-keygen            生成公钥私钥,实现ssh无密码验证(一路回车)
+ssh-copy-id    root@IP    发送给目标主机
+#!/bin/bash           编写脚本
+while [inotifywait -rqq  源目录]
+do
+    rsync  -az --delete  源目录  目标
+done
+
+
