@@ -42,6 +42,7 @@ yum软件
 yum  -y install 软件包      安装软件
 yum groupinstall  软件包组  安装组包
 yum info 软件包            关于软件的描述信息
+yum provide  目录/文件      查看生成该目录的软件包
 
 rpm软件
 rpm -ivh 软件  安装软件
