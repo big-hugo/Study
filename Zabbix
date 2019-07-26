@@ -45,7 +45,7 @@ vim   /etc/php.ini                           修改配置文件为zabbix页面�
 394 max_input_time = 300                     服务器接收数据的时间限制
 672 post_max_size = 16M                      post数据最大容量
 878 date.timezone = Asia/Shanghai            设置时区
-vim /usr/\local/nginx/conf/nginx.conf        修改配置文件为zabbix页面提供环境
+vim /usr/local/nginx/conf/nginx.conf        修改配置文件为zabbix页面提供环境
 http{   fastcgi_buffers 8 16k;               缓存php生成的页面内容 8个16K
         fastcgi_buffer_size 32k;             缓存php产生的头部信息
         fastcgi_connect_timeout 300;         连接PHP的超时时间
@@ -55,15 +55,6 @@ yum -y install php-gd php-xml php-ldap php-bcmath php-mbstring    安装依赖�
 systemctl  restart php-fpm                   重启php-fpm服务
 /usr/local/nginx/sbin/nginx -s stop          
 /usr/local/nginx/sbin/nginx                  重启nginx服务
-现在可以访问自身zabbix网页 firefox 127.0.0.1/index.php 进行连接配置
-登录账号为admin  密码zabbix;点击右上角个人配置,可修改密码和切换语言
-vim /usr/local/nginx/html/conf/zabbix.conf.php  可以在此文件查看或修改配置信息
-$DB['TYPE']     = 'MYSQL';                  $ZBX_SERVER      = 'localhost';
-$DB['SERVER']   = 'localhost';              $ZBX_SERVER_PORT = '10051';
-$DB['PORT']     = '0';                      $ZBX_SERVER_NAME = '自定义';
-$DB['DATABASE'] = 'zabbix';
-$DB['USER']     = 'zabbix';
-$DB['PASSWORD'] = 'zabbix';
 启动zabbix监控服务
 vim /usr/local/etc/zabbix_server.conf       修改配置文件
 38 LogFile=/tmp/zabbix_server.log           日志位置                   
@@ -73,6 +64,16 @@ vim /usr/local/etc/zabbix_server.conf       修改配置文件
 119 DBPassword=zabbix                       数据库连接密码
 useradd zabbix                              系统添加zabbix用户
 zabbix_server                               启动服务(端口10051)
+现在可以访问自身zabbix网页 firefox 127.0.0.1/index.php 进行连接配置
+登录账号为admin  密码zabbix;点击右上角个人配置,可修改密码和切换语言
+vim /usr/local/nginx/html/conf/zabbix.conf.php  可以在此文件查看或修改配置信息
+$DB['TYPE']     = 'MYSQL';                  $ZBX_SERVER      = 'localhost';
+$DB['SERVER']   = 'localhost';              $ZBX_SERVER_PORT = '10051';
+$DB['PORT']     = '0';                      $ZBX_SERVER_NAME = '自定义';
+$DB['DATABASE'] = 'zabbix';
+$DB['USER']     = 'zabbix';
+$DB['PASSWORD'] = 'zabbix';
+
 配置被监控端(客户端)
   yum -y install gcc pcre-devel             安装依赖包 
   tar -xf zabbix-3.4.4.tar.gz               解开源码包
@@ -87,7 +88,7 @@ useradd zabbix                              系统添加zabbix用户
 zabbix_agentd                               启动服务(端口10050)                                            
 
 配置监控页面(图形界面)
-firefox 监控服务器IP/index.php                 打开zabbix页面
+firefox 监控服务器IP/index.php                打开zabbix页面
 配置(头顶栏)->主机->创建主机(配置主机,监控模板)   填入信息创建主机
 监控中(头顶栏)->最新数据->选择主机              查看监控信息
 自定义监控
@@ -105,7 +106,7 @@ zabbix监控报警
 当监控满足条件,会发出警告和发送邮件
 yum -y install postfix mailx                 服务器安装邮件服务后启动postfix
 在对应的监控模板定义触发器,管理->报警媒介类型->Email(配置发件人,发件服务器,主机名)  
-管理->用户->报警媒介->添加收件人     配置->动作->创建动作(选择触发器)->操作(收件人为标题,添加操作)
+管理->用户->报警媒介->添加收件人     配置->动作->创建动作(选择触发器)->操作(收件人为标题,添加操作,仅送到选Email)
 自动发现
 zabbix自动发现后会执行设定的操作
 配置->自动发现->创建发现规则
@@ -122,7 +123,7 @@ vim /usr/local/etc/zabbix_agentd.conf        修改配置文件
 useradd zabbix                               系统添加用户
 zabbix_agentd                                启动服务
 服务端网页配置
-配置->模板->点击已有模板->全部克隆(改名字,群组)->监控项(全选)->批量更新->类型(zabbix客户端主动)
+配置->模板->点击已有模板名字->全部克隆(改名字,群组)->克隆成功->监控项(全选)->批量更新->类型(zabbix客户端主动)
 配置->主机->创建主机(主机名与配置文件中一致,ip0.0.0.0,端口0)->模板(关联克隆的模板)
 
 拓扑图
