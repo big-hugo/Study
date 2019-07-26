@@ -100,7 +100,7 @@ UserParameter=自定义名称,命令                  自定义命令语法格�
 killall zabbix_agentd                        杀死进程
 zabbix_agentd                                启动进程
 zabbix_get -s 127.0.0.1 -p 10050 -k 自定义名称       测试自定义命令是否可以执行
-模板->创建模板->创建应用集->创建监控项(Key必须与配置文件一致)->模板关联主机
+模板->创建模板->创建应用集->创建监控项(Key必须与配置文件中一致)->模板关联主机
 zabbix监控报警
 当监控满足条件,会发出警告和发送邮件
 yum -y install postfix mailx                 服务器安装邮件服务后启动postfix
@@ -115,7 +115,7 @@ zabbix自动发现后会执行设定的操作
 默认被监控主机都是被动监控的,使用主动监控,被监控端会自己发送Agent数据,监控端仅需保存数据即可
 vim /usr/local/etc/zabbix_agentd.conf        修改配置文件
 93 # Server=127.0.0.1                        注释改行(不允许被发现)
-118  StartAgents=0                           进制被动监控(有进程没端口)
+118  StartAgents=0                           禁止被动监控(有进程没端口)
 134  ServerActive=监控端IP                    监控服务器ip,一定要取消127.0.0.1
 145 Hostname=自身主机名                        告诉服务器自己的机名(与服务器配置的监控主机名称一致)
 183  RefreshActiveChecks=120                 120秒检测一次
@@ -132,7 +132,8 @@ zabbix_agentd                                启动服务
 在一个页面显示多个数据图表,方便了解多组数据
 监测中->聚合图形->创建聚合图形->构造函数->更改(选择图表 宽200 高80 )
 
-在客户端编写监控脚本,给监控服务器调用
+自定义监控案例
+在客户端编写网页访问量监控脚本,给监控服务器调用
 ./configure --with-http_stub_status_module   nginx安装状态模块
 make && make install                         安装
 vim /usr/local/nginx/conf/ngxin.conf         修改配置文件,开启状态页面
@@ -153,8 +154,30 @@ vim /usr/local/etc/zabbix_agentd.conf.d/nginx_status.conf   编写监控脚本,�
 UserParameter=nginx_statu[*],/usr/local/nginx/nginx_status.sh $1  *代表调用命令时传的值 
 killall -9 zabbix_agentd && zabbix_agentd             杀进程重启服务
 zabbix_get -s 127.0.0.1 -p 10050 -k nginx_statu[active]     测试监控脚本可用性
+模板->创建模板->创建应用集->创建监控项(Key必须与配置文件中一致)->模板关联主机
 
+编写监控tcp连接状态的脚本
+vim /usr/local/etc/zabbix_agentd.conf.d/check_net.sh
+#!/bin/bash
+case $1 in
+'estab')
+        ss -antp | awk '/^ESTAB/{x++}END{print x}';;
+'close_wait')
+        ss -antp | awk '/^CLOSE-WAIT/{x++}END{print x}';;
+'time_wait')
+        ss -antp  | awk '/^TIME-WAIT/{x++}END{print x}'
+esac
+vim /usr/locl/etc/zabbix_agentd.conf.d/check_tcp.sh        编写监控脚本,让zabbix可以使用
+UserParameter=tcp_statu[*],/usr/locl/etc/zabbix_agentd.conf.d/check_tcp.sh $1  *代表调用命令时传的值 
+killall -9 zabbix_agentd && zabbix_agentd             杀进程重启服务
+zabbix_get -s 127.0.0.1 -p 10050 -k tcp_statu[estab]     测试监控脚本可用性
+模板->创建模板->创建应用集->创建监控项(Key必须与配置文件中一致)->模板关联主机
 
+常见监控需求
+mysql:并发连接数,慢查询数,增删改查数量
+NoSQL:数据库状态
+php-fpm(生成status页面):并发,队列,进程数量
+硬件设备(交换机,路由器):一般通过SNMP监控
 
 
 
