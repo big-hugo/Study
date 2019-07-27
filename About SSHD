@@ -1,9 +1,0 @@
-sshd
-远程连接服务,默认端口22,centos系统自带
-ssh -X 用户名@目标ip  -p 端口      远程连接,-X为显示图形界面
-ssh-keygen -f /root/.ssh/id_rsa -N ''  非交互生成秘钥
-ssh-copy-id  服务器ip        发送秘钥到服务器,实现免密登录
-
-scp
-ssh+cp命令
-ssh -P 端口  本地目录  用户@目标ip    远程传输文件,-r传输目录

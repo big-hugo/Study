@@ -1,0 +1,22 @@
+sshd
+远程连接服务,默认端口22,centos系统自带
+配置文件 /etc/ssh/sshd_config
+Port 22       默认端口22,可以修改
+ListenAddress 0.0.0.0   默认自身所有端口接收请求,可修改
+PermitRootLogin yes     默认允许root登录,改为no不予许
+UseDNS no     不解析客户地址
+LoginGraceTime  1m      登录限时
+MaxAuthTries    3       每连接最多认证次数
+PubkeyAuthentication yes    不允许口令登录(提前准备好密钥对登录)
+DenyUsers  用户 [用户...]       用户黑名单
+AllowUsers  用户@主机           用户白名单
+DenyGroups  组  [组...]        组黑名单
+AllowGroups  组 [组...]        组白名单
+
+用法
+ssh -X 用户名@目标ip  [-p 端口]     远程连接,-X为显示图形界面
+ssh-keygen   (一路回车)            交互式生成秘钥对
+ssh-keygen -f /root/.ssh/id_rsa -N ''  非交互生成秘钥对
+ssh-copy-id  用户名@服务器ip        发送公钥到服务器,实现免密登录(任何机子得到私钥即可远程服务器)
+ssh+cp命令
+ssh -P 端口  本地目录  用户@目标ip    远程传输文件,-r传输目录
