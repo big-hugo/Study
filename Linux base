@@ -43,9 +43,19 @@ w         查看已登录用户信息
 last      查看登录成功用户记录
 lastb     查看登录失败用户记录
 
-
-
-
+ftp功能
+可用于共享文件
+yum -y install vsftp  安装软件包
+vim /etc/vsftp/vsftp.conf    修改主配置文件
+29 anon_upload_enable=YES    开启匿名用户上传功能
+systemctl restart vsftp      重启服务
+客户端连接
+yum -y install ftp   安装软件包
+ftp  目标IP          访问目标主机的FTP
+Name (192.168.2.201:root): ftp    匿名登录(密码回车)
+ftp> lcd    目录      进入本地目录
+ftp> put    文件      上传文件(需要解开selinux限制)setsebool -P ftpd_anon_write on && setsebool -P ftpd_full_access on
+ftp> get    文件      下载文件
 
 
 
