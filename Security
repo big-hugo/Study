@@ -1,0 +1,87 @@
+用户和密码
+chage工具
+chage -E  2019/07/31 用户名      指定账号过期时间
+chage -l  用户名                 查看用户密码信息
+chage -d 0 用户名                指定用户下次登录必须修改密码
+passwd命令
+passwd  用户名               交互式修改密码
+echo '密码' | passwd --stdin 用户名    非交互式修改密码
+passwd -S 用户名             查看密码状态
+passwd -l 用户名             锁定用户
+passwd -u 用户名             解锁用户
+用户默认配置
+vim /etc/login.defs         添加用户的默认配置文件
+PASS_MAX_DAYS   99999       密码最大有效期
+PASS_MIN_DAYS   0           密码最小有效期(多久改一次密码)
+PASS_MIN_LEN    5           最少长度
+PASS_WARN_AGE   7           过期前7天警告
+用户切换su
+su  -  [用户名]       切换用户(切换系统环境)
+su  用户名            切换用户(不切换系统环境)
+su [-] -c  "命令"  [用户名]   以用户身份去执行命令   
+vim /var/log/secure  记录su操作的日志文件
+用户提权sudo
+设置系统普通用户可以执行root用户命令的权限
+sudo  命令            普通用户提权执行命令
+sudo  -l              查看是否可以提权
+visudo               打开主配置文件(可修改)
+vim /etc/sudoers     主配置文件(:wq!强制保存退出)
+Defaults logfile="/var/log/sudo"  追加这一句,开启日志文件,可查看用户提权记录
+User_Alias  别名=用户       定义用户别名(别名必须大写,可多个用户)
+Host_Alias  别名=主机       定义主机别名(别名大写,可多个主机)  
+Cmnd_Alias  别名=命令       定义命令别名(别名大写,可多个命令)
+授权格式: 用户  主机列表=命令绝对路径列表
+        %组名  主机列表=命令绝对路径列表
+        %whell ALL=(ALL)   NOPASSWD:ALL(无需验证可执行所有命令) 
+用户名   localhost,主机名=/usr/bin/vim /etc/my.cnf , /usr/bin/systemctl * mysqld    给予用户数据库操作提权
+用户名   localhost,主机名=/sbin/*,!/sbin/ifconfig eth0      给予用户sbin下所有命令权限,除了ifconfig
+
+
+
+
+
+
+伪装登录(用于隐藏系统和内核版本)
+vim /etc/issue              本地登录提示文件
+vim /etc/issue.net          远程登录提示文件
+
+文件系统安全
+chkconfig  httpd  off/on    RHEL6系统服务操作命令
+systemctl  enable/disable  httpd    RHEL7系统服务操作命令
+锁定/解锁保护文件(root用户同样受到限制)
+EXT3/EXT4的文件属性控制  属性i:不可变  属性a:仅可追加
+chatte  +a   文件     设置对文件属性(+-=可用)
+lsattr [-l]  文件     查看文件属性
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
