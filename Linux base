@@ -32,17 +32,6 @@ systemctl  isolate  graphical.target     切换图形模式
 systemctl  set-default  graphical.target    默认开机图形模式
 systemctl  get-default    查看默认开机模式
 
-日志管理
-由系统服务rsyslog统一管理和记录,日志消息等级0~7,数值越小越紧急
-/var/log/messages     记录内核,各种服务           /var/log/maillog      记录邮件收发
-/var/log/dmesg        记录系统启动过程            /var/log/secure       记录访问限制相关
-/var/log/cron         记录cron计划任务
-user      查看已登录用户信息
-who       查看已登录用户信息
-w         查看已登录用户信息
-last      查看登录成功用户记录
-lastb     查看登录失败用户记录
-
 ftp功能
 可用于共享文件
 yum -y install vsftp  安装软件包
