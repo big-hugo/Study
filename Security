@@ -67,25 +67,42 @@ aide --init             初始化检测(记录当前系统检测情况)
 mv  /var/lib/aide/aide.db.new.gz  /var/lib/aide/aide.db.gz  数据备份(一般备份到移动设备)
 aide --check            检测对比信息(与初始化检测的文件作对比)
 
+日志管理
+由系统服务rsyslog统一管理和记录,日志消息等级0~7,数值越小越紧急
+/var/log/messages     记录内核,各种服务           /var/log/maillog      记录邮件收发
+/var/log/dmesg        记录系统启动过程            /var/log/secure       记录访问限制相关
+/var/log/cron         记录cron计划任务
+user      查看已登录用户信息
+who       查看已登录用户信息
+w         查看已登录用户信息
+last      查看登录成功用户记录
+lastb     查看登录失败用户记录
+
 扫描与抓包
 主流扫描软件:Scan主动监测,Sniff被动监听/嗅探,Capture数据包捕获(抓包),NMAP强大的网络探测利器工具
 NMAP扫描软件
 用法格式:   nmap  [扫描类型]  [选项]  扫描目标...
-扫描类型:  -sS TCP-SYN扫描(半开)    -sT  TCP连接扫描(全开,默认)   -sU  UDP扫描   -sP  ICMP扫描  -A 目标系统全面解析
+扫描类型:  -sS TCP-SYN扫描(半开,DDOS攻击原理)    -sT  TCP连接扫描(全开,默认)   -sU  UDP扫描   -sP  ICMP扫描  -A 目标系统全面解析
+选项:     -p 扫描指定端口     -n 不执行dns扫描(速度更快)
 yum -y install nmap       安装软件
-
-
-
-
-
-
-
-
-
-
-
-
-
+nmap -p 21-80   192.168.4.0/24     扫描4网段的主机指定端口
+nmap -n 192.168.4.0/24    扫描4网段有多少主机开启
+nmap www.baidu.com        扫描百度的服务端口
+tcpdump抓包命令
+yum -y install tcpdump    安装软件
+用法格式: tcpdump   [选项]   [过滤条件]
+选项: -i 指定监控的网络接口  -A 转为ACSII码方便阅读  -w 将数据包信息保存到指定文件  -c 定义抓包个数  -r 从指定文件读取数据包信息
+过滤条件: 类型host net port portrange  方向src dst  协议tcp udp ip wlan arp  多个条件组合and or not
+tcpdump -i  网卡名称       指定网卡抓包
+tcpdump -c 2 -w x.cap     抓两个包保存到x.cap文件
+tcpdump -r x.cap          读取x.cap文件
+tcpdump -i eth0 -A tcp port 22 and host 172.121.213.105 or host 172.121.213.111     查看是否有来自该IP的连接
+tcpdump -A dst host 192.168.4.5 and tcp port 110          按条件抓取POP3的数据包(可查看账号密码)
+tcpdump  -A  -w ftp.cap host 192.168.4.254 and port 21    把来自254接收端口21的包信息保存到ftp.cap
+tcpdump  -A -r ftp.cap | egrep '(USER|PASS)'    过滤抓到包的用户信息
+WireShark图形环境抓包软件
+yum -y install wireshark wireshark-gnome    安装软件包
+wireshark       运行软件
 
 
 
