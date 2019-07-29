@@ -62,11 +62,17 @@ vim /etc/aide.conf      主配置文件
 4 @@define LOGDIR /var/log/aide           日志目录
 7 database=file:@@{DBDIR}/aide.db.gz      数据库文件名
 54 FIPSR = p+i+n+u+g+s+m+c+acl+selinux+xattrs+sha256   检测的策略名=检测项目
+98 /root/    FIPSR     用FIPSR检测策略检测root目录
+aide --init             初始化检测(记录当前系统检测情况)
+mv  /var/lib/aide/aide.db.new.gz  /var/lib/aide/aide.db.gz  数据备份(一般备份到移动设备)
+aide --check            检测对比信息(与初始化检测的文件作对比)
 
-
-
-
-
+扫描与抓包
+主流扫描软件:Scan主动监测,Sniff被动监听/嗅探,Capture数据包捕获(抓包),NMAP强大的网络探测利器工具
+NMAP扫描软件
+用法格式:   nmap  [扫描类型]  [选项]  扫描目标...
+扫描类型:  -sS TCP-SYN扫描(半开)    -sT  TCP连接扫描(全开,默认)   -sU  UDP扫描   -sP  ICMP扫描  -A 目标系统全面解析
+yum -y install nmap       安装软件
 
 
 
