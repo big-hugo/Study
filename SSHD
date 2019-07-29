@@ -20,3 +20,4 @@ ssh-keygen -f /root/.ssh/id_rsa -N ''  非交互生成秘钥对
 ssh-copy-id  用户名@服务器ip        发送公钥到服务器,实现免密登录(任何机子得到私钥即可远程服务器)
 ssh+cp命令
 ssh -P 端口  本地目录  用户@目标ip    远程传输文件,-r传输目录
+echo > /var/log/wtmp或btmp        清除用户登录信息
