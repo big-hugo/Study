@@ -31,6 +31,56 @@ touch  /.autorelabel          创建该文件,下次重启系统全部恢复上�
 getsebool -a          查看所有配置项布尔值
 setsebool -P  配置项名称 on/off      开/关布尔值
 
+MD5数值校验
+根据输入的文件生成不同的哈希值,可通过对比哈希值检测文件是否有变化
+md5sum  文件            生成哈希值
+
+GPG加/解密工具
+gpg --version           查看软件版本信息
+gpg对称加密与解密
+gpg -c 文件             设置密码
+file  文件*              查看加密后文件(加密后会生成文件.gpg)
+gpg -d  加密后文件  >  输出到文档      解密文档(不同用户需要输入密码)
+gpg非对称加密与解密
+(mv /dev/random /dev/random.bak    如果启动不了或过慢
+ln -s /dev/urandom /dev/random    执行这两部操作进行内存调整)
+gpg --gen-key           创建秘钥对(秘钥对存放在~/.gnupg/)
+gpg --list-keys         查看秘钥信息
+gpg --export -a  >  用户名.pub       生成公钥文件(发送给目标用户)
+gpg --import 用户名.pub              导入公钥文件
+gpg -e -r 公钥用户名   文件           用公钥给文件加密(生成文件.gpg)
+gpg -d  加密文件         解密文档(输入公钥设置的密码)
+gpg数字签名与验证签名(私钥文件签名 公钥文件验证签名)
+gpg -b 文件              给文件作签名(生成文件.sig)
+gpg --import 用户名.pub              导入公钥文件
+gpg --verify  文件       检验签名(没修改会提示完好签名)
+
+AIDE入侵检测系统
+yum -y install aide     安装软件包
+vim /etc/aide.conf      主配置文件 
+3 @@define DBDIR /var/lib/aide            数据库目录
+4 @@define LOGDIR /var/log/aide           日志目录
+7 database=file:@@{DBDIR}/aide.db.gz      数据库文件名
+54 FIPSR = p+i+n+u+g+s+m+c+acl+selinux+xattrs+sha256   检测的策略名=检测项目
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
