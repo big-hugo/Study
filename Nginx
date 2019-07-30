@@ -6,6 +6,7 @@ useradd -s /sbin/nologin nginx   系统新建一个非登录用户
 /usr/local/nginx/sbin/nginx  -s stop   停止服务
 /usr/local/nginx/sbin/nginx  -s reload  重载配置
 /usr/local/nginx/sbin/nginx -v  查看版本信息
+/usr/local/nginx/sbin/nginx  -t  检查配置文件是否正确
 ln -s /usr/local/nginx/sbin/nginx  /sbin   创建软连接可以快捷使用
 echo "/usr/local/nginx/sbin/nginx" >> /etc/rc.local   设定开机自启的命令 
 chmod +x /etc/rc.local 确保有执行权限
