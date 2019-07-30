@@ -8,6 +8,7 @@ history -c    清除当前终端历史命令
 rm  -rf  ~/.bash_history      清除系统所有历史命令
 rm  -rf  ~/.mysql_history     清除数据库所有历史命令
 echo > /var/log/wtmp或btmp     清除用户登录信息
+su -  -c "命令" 用户            以其他用户执行命令
 
 进程管理
 树型结构,父进程与子进程,僵尸进程,孤儿进程
