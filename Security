@@ -104,6 +104,93 @@ WireShark图形环境抓包软件
 yum -y install wireshark wireshark-gnome    安装软件包
 wireshark       运行软件
 
+系统审计
+基于事先配置好的规则生成日志,用于发现并记录违反安全策略的人及其对应的行为
+yum  -y install  audit              安装软件包    
+systemctl start auditd.service      启动服务
+systemctl enable auditd.service     设定开机自启
+vim  /etc/audit/auditd.conf         主配置文件
+log_file = /var/log/audit/audit.log       日志文件
+auditctl -s                         查询审计状态
+auditctl -l                         查看审计规则
+auditctl -D                         删除所有规则
+auditctl -w  文档  -p [r,w,x,a]  -k  规则名          定义临时审计规则
+auditctl -w  /etc/passwd  -p wa -k  passwd_change  定义临时审计规则(审计/etc/passwd是否被写入,属性是否修改,规则名为passwd_change)
+auditctl -w /etc/selinux/ -p wa -k selinux_chage   定义临时审计规则(审计/etc/selinux是否被写入,属性是否修改,规则名为selinux_change)
+auditctl -w /usr/sbin/fdisk -p x -k fdisk_parition
+vim /etc/audit/rules.d/audit.rules        定义永久审计规则
+-w /etc/passwd -p wa -k passwd_change     追加到配置文件
+-w /etc/selinux -p wa -k selinux_chage    追加到配置文件
+ausearch -k 规则名 [-i]               查看规则日志(success事件是否成功,auid是审核用户的id,comm执行的指令,exe实际程序路径)
+aureport                             审计信息报表
+
+服务安全
+nginx服务安全
+防止别人进入网站目录下查看服务器的网页
+./configure --without-http_autoindex_modul && make && make install    关闭模块
+隐藏nginx服务版本
+curl -I ip或域名         查看网页服务器信息(可显示出版本)
+vim /nginx-1.12.2/src/http/ngx_http_header_filter_module.c    修改源文件  
+50 static u_char ngx_http_server_full_string[] = "Server: 自定义" CRLF;   修改版本信息
+./configure && make && make install     重新编译安装
+限制并发(1台客户端的并发连接数量),降低DDos攻击风险
+vim /usr/local/nginx/conf/nginx.conf    修改配置文件
+http {
+limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;    定义一个10m的储存空间,每秒处理一个请求
+server {
+ limit_req zone=one burst=5;              储存空间储存5个请求
+ ab -c 客户数 -n 请求数 http://127.0.0.1/       并发量测试
+拒绝非法请求
+vim /usr/local/nginx/conf/nginx.conf    修改配置文件
+server{
+    if($require_method !~ ^(GET|POST)$){        匹配GET|POST请求
+      return 444;                        返回444 
+curl -i -X HEAD http://127.0.0.1/        测试配置(空返回值)
+数据库服务安全
+数据库初始化安全脚本
+mysql_secure_installation                命令行输入启动安全脚本回车
+Change the password for root ?           需要修改root密码?
+Remove anonymous users?                  删除匿名账户?
+Disallow root login remotely?            允许root远程登录?
+Remove test database and access to it?   删除测试库?
+Reload privilege tables now?             刷新权限表?
+抓包验证数据库服务器能否被访问
+tcpdump -w log -i eth0 src or dst port 3306
+删除记录历史文件
+history -c    清除当前终端历史命令
+rm  -rf  ~/.bash_history      清除系统所有历史命令
+rm  -rf  ~/.mysql_history     清除数据库所有历史命令
+tomcat服务安全
+隐藏软件版本
+ curl -I http://192.168.4.50:8080         查看网页服务器版本
+ yum -y install java-1.8.0-openjdk-devel  安装jar
+ jar -xf /tomcat/org/apache/catalina.jar  解压包
+ vim lib/org/apache/catalina/util/ServerInfo.properties   修改源文件
+ server.info=自定义      修改版本信息
+ bin/shutdown.sh        关闭服务
+ bin/startup.sh         开启服务
+健全运行
+useradd tomcat            系统添加用户
+chown -R tomcat /usr/local/tomcat       授权
+su -  -c "/usr/local/tomcat/bin/startup.sh" tomcat        以tomcat用户运行启动命令
+
+linux创建补丁文件
+diff逐行比较
+diff [选项]  文件1 文件2              文档对比
+-u 输出统一内容的头部信息(打补丁使用)
+-r 递归对比目录中的所有资源(可以对比目录)
+-a 所有文件视为文本(包括二进制程序)
+-N 无文件视为空文件(空文件怎么变成第二个文件)
+diff [选项]  文件1 文件2  >  补丁文件   生成补丁文件
+patch打补丁
+yum -y install patch        安装软件
+patch -p数字 < 补丁文件       给文件打补丁(数字代表删除补丁文件中多少层路径前缀,0代表在补丁文件所在路径)
+patch -RE < 补丁文件         反向修复(撤回)
+
+
+
+
+
 
 
 
