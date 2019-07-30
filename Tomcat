@@ -24,7 +24,19 @@ keytool -genkeypair -alias tomcat -keyalg RSA -keystore /usr/local/tomcat/keysto
 日志存放在/usr/local/tomcat/log/下
 虚拟主机把默认主机的<Valve.../>段复制下来,修改prefix="日志文件名"即可使用
 
+隐藏版本信息
+curl -I http://192.168.4.50:8080         查看网页服务器版本
+ yum -y install java-1.8.0-openjdk-devel  安装jar
+ jar -xf /tomcat/org/apache/catalina.jar  解压包
+ vim lib/org/apache/catalina/util/ServerInfo.properties   修改源文件
+ server.info=自定义      修改版本信息
+ bin/shutdown.sh        关闭服务
+ bin/startup.sh         开启服务
 
+健全运行
+useradd tomcat            系统添加用户
+chown -R tomcat /usr/local/tomcat       授权
+su -  -c "/usr/local/tomcat/bin/startup.sh" tomcat        以tomcat用户运行启动命令
 
 
 
