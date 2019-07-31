@@ -187,14 +187,51 @@ yum -y install patch        安装软件
 patch -p数字 < 补丁文件       给文件打补丁(数字代表删除补丁文件中多少层路径前缀,0代表在补丁文件所在路径)
 patch -RE < 补丁文件         反向修复(撤回)
 
-
-
-
-
-
-
-
-
+防火墙
+RHEL7  firewalld(默认),但底层还是调用包过滤防火墙iptables   
+RHEL6和5  iptables           
+iptables基本用法
+防火墙服务的组成: raw状态跟踪表     mangle包标记表     nat地址转换表      filter过滤表(默认)
+链: INPUT进入防火墙主机的包   OUTPUT从防火墙主机出去的包   FORWARD从防火墙主机经过的包  
+    POSTROUTING路由后处理    PREROUTING路由前处理 
+选项: -L列出所有规则条目 -A链末尾追加规则 -I指定编号插入规则 -D清除指定编号 -F清除所有 -n数字形式显示 --line-numbers以编号显示  
+     -P为指定的链设置默认规则(ACCEPT|DROP)
+条件: -p 协议名  -i 收数据的网卡  -o 发数据的网卡  --sport 源端口  --dport 目标端口  -s 源地址  -d 目标地址 
+     --icmp-type ICMP类型(echo-request|echo-reply )       需要取反时,用!号;顺序比对,匹配及停止(LOG除外)
+目标操作:ACCEPT允许通过   DROP直接丢弃,不给出回应  REJECT拒绝通过,必要时给出提示  LOG记录日志,然后传给下一条规则
+iptables  [-t 表名]  选项  [链名]  [条件]  [-j 目标操作]
+yum -y install iptables-services     安装软件
+systemctl start iptables.service     启动服务(顺带开机自启enable)
+iptables-save > /etc/sysconfig/iptables        永久保存防火墙规则
+自定义防火墙规则
+主机型防火墙
+iptables -t filter -A INPUT -p tcp --dport 22 -j ACCEPT     追加规则允许22端口tcp类型的数据通过
+iptables -t filter -P INPUT  DROP                           把filter表INPUT链的默认规则设为DROP
+iptables -t filter  -I INPUT 2 -p tcp --dport 80 -s 192.168.4.0/24 -j ACCEPT  插入filter表编号为2的规则允许来自4网段进入80端口
+iptables -t filter -A INPUT -p icmp --icmp-type echo-reply -j ACCEPT    追加规则允许ping的回应包进入
+网络型防火墙(适用于作网络交换机的服务器)
+echo 1 >   /proc/sys/net/ipv4/ip_forward && sysctl -p     开启路由功能
+iptables -t filter -P FORWARD DROP        默认拒绝经过的数据包
+iptables -t filter -A FORWARD -p icmp -j ACCEPT   添加规则允许icmp协议数据包通过(ping是icmp协议)
+iptables -t filter -A FORWARD -p tcp --dport 80 -j ACCEPT     添加规则允许80端口的数据包流出
+iptables -t filter -A FORWARD -p tcp --sport 80 -j ACCEPT     添加规则允许80端口的数据包流入
+iptables -t filter -A FORWARD -p tcp --dport 22 -j ACCEPT     添加规则允许22端口的数据包流出
+iptables -t filter -A FORWARD -p tcp --sport 22 -j ACCEPT     添加规程允许22端口的数据包流如
+扩展匹配
+-m mac -mac-source MAC地址   
+arp -a    查看服务器记录的MAC地址
+iptables -t filter  -I FORWARD 3 -p icmp -m mac --mac-source 52:54:00:a5:96:66 -j DROP
+-m multiport --sports 源端口列表
+iptables -t filter  -A FORWARD -p tcp -m multiport --sports 22,80 -j ACCEPT
+-m multiport --dports 目标端口列表
+iptables -t filter  -A FORWARD -p tcp -m multiport --dports 22,80 -j ACCEPT
+-m iprange --src-range 来源IP1-IP2
+iptables -t filter  -I FORWARD  3 -p icmp -m iprange --src-range 192.168.2.50-192.168.2.60 -j REJECT
+-m iptange --dst-range 目标IP1-IP2
+nat表的使用(使用nat表做数据包中原地址转换 实现所有主机共享同一个公网ip地址)
+iptables -t nat -A POSTROUTING -s 192.168.2.0/24 -p tcp --dport 80 -j SNAT --to-source 192.168.4.51  把2网段转换为公网地址4.51
+公网地址是服务上动态分配时,定义防火墙规则
+iptables -t nat -A POSTROUTING -s 192.168.2.0/24 -p tcp --dport 80 -o eth0 -j MASQUERADE  
 
 
 
