@@ -9,6 +9,8 @@ rm  -rf  ~/.bash_history      清除系统所有历史命令
 rm  -rf  ~/.mysql_history     清除数据库所有历史命令
 echo > /var/log/wtmp或btmp     清除用户登录信息
 su -  -c "命令" 用户            以其他用户执行命令
+sysctl -a     查看所有内核参数
+echo 1 > /proc/sys/net/ipv4/ip_forward    开机内核路由转发功能
 
 进程管理
 树型结构,父进程与子进程,僵尸进程,孤儿进程
