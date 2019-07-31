@@ -1,5 +1,6 @@
 cal  1752     查看年历
 route -n      查看路由表
+route add/del default gw 192.168.2.51     添加/删除网关
 echo "/usr/local/nginx/sbin/nginx" >> /etc/rc.local   设定开机自启的命令
 /usr/lib/systemd/system/此目录下可以设置systemctl管理的服务,可通过复制目录下的源文件修改命令路径使用 type=forking
 which java    查看命令编译路径
@@ -10,7 +11,8 @@ rm  -rf  ~/.mysql_history     清除数据库所有历史命令
 echo > /var/log/wtmp或btmp     清除用户登录信息
 su -  -c "命令" 用户            以其他用户执行命令
 sysctl -a     查看所有内核参数
-echo 1 > /proc/sys/net/ipv4/ip_forward    开机内核路由转发功能
+echo 1 > /proc/sys/net/ipv4/ip_forward  &&  sysctl -p  开机内核路由转发功能
+arp -a        查看本机缓存记录的MAC地址
 
 进程管理
 树型结构,父进程与子进程,僵尸进程,孤儿进程
