@@ -39,13 +39,13 @@ mysql -uzabbix -pzabbix zabbix < zabbix-3.4.4/database/mysql/images.sql
 mysql -uzabbix -pzabbix zabbix < zabbix-3.4.4/database/mysql/data.sql
 cd zabbix-3.4.4/frontends/php/               进入zabbix网页目录
 cp -a * /usr/local/nginx/html/               复制网页到nginx网页目录(-a复制权限)
-chmod -R 777 /usr/local/nginx/html/*         递归给权限nginx网页目录
+chmod -R 777 /usr/local/nginx/html/          递归给权限nginx网页目录
 vim   /etc/php.ini                           修改配置文件为zabbix页面提供环境
 384 max_execution_time = 300                 最大执行时间(秒)
 394 max_input_time = 300                     服务器接收数据的时间限制
 672 post_max_size = 16M                      post数据最大容量
 878 date.timezone = Asia/Shanghai            设置时区
-vim /usr/local/nginx/conf/nginx.conf        修改配置文件为zabbix页面提供环境
+vim /usr/local/nginx/conf/nginx.conf         修改配置文件为zabbix页面提供环境
 http{   fastcgi_buffers 8 16k;               缓存php生成的页面内容 8个16K
         fastcgi_buffer_size 32k;             缓存php产生的头部信息
         fastcgi_connect_timeout 300;         连接PHP的超时时间
@@ -64,10 +64,11 @@ vim /usr/local/etc/zabbix_server.conf       修改配置文件
 119 DBPassword=zabbix                       数据库连接密码
 useradd zabbix                              系统添加zabbix用户
 zabbix_server                               启动服务(端口10051)
+如果启动失败,修改正确配置文件后杀死进程zabbix_server后再启动
 现在可以访问自身zabbix网页 firefox 127.0.0.1/index.php 进行连接配置
 登录账号为admin  密码zabbix;点击右上角个人配置,可修改密码和切换语言
 vim /usr/local/nginx/html/conf/zabbix.conf.php  可以在此文件查看或修改配置信息
-$DB['TYPE']     = 'MYSQL';                  $ZBX_SERVER      = 'localhost';
+$DB['TYPE']     = 'MYSQL';                  $ZBX_SERVER      = '本机ip地址';
 $DB['SERVER']   = 'localhost';              $ZBX_SERVER_PORT = '10051';
 $DB['PORT']     = '0';                      $ZBX_SERVER_NAME = '自定义';
 $DB['DATABASE'] = 'zabbix';
