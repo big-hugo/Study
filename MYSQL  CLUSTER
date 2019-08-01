@@ -1,3 +1,8 @@
+主从服务器结构
+一主多从结构:从--->主<----从
+主从从结构:主<--从<--从      中间机子配置文件加入log_slave_updates   允许级联复制
+主主结构:主<----->主
+
 mysql主从同步,主更新会在从上更新,从更新与主无关
 原理master启用binlog日志;
 slave_IO复制master的binlog日志到本机的relay-log文件,slave_SQL执行relay-log里面的语句确保和主机一样
@@ -24,11 +29,6 @@ change master to master_host='192.168.4.51',        输入主库信息
     -> master_log_pos=偏移量;
 start slave;                          开启进程
 show slave status;                    查看状态(里面有排错信息)
-
-主从服务器结构
-一主多从结构:从--->主<----从
-主从从结构:主<--从<--从      中间机子配置文件加入log_slave_updates   允许级联复制
-主主结构:主<----->主
 
 复制模式介绍
 异步复制(默认 ):主库执行完一次事务后,立即返回给客户端,不管从库是否接受并处理
@@ -78,6 +78,7 @@ max_slave_connections=100%
 #[Read-Only Listener]       注释这一段,不监听只读服务
 [Read-Write Listener]       这段监听读写可以修改端口
 [MaxAdmin Listener]         这段监听管理可以定义端口
+port=4007
 maxscale -f /etc/maxscale.cnf    启动程序(先配置后端主服务器)
 killall  -9  maxscale            停止进程
 maxadmin -uadmin -pmariadb -P4007   连接到监控信息,-P管理段的端口
@@ -233,7 +234,7 @@ PXC高可用数据库集群
 无同步延迟,没有主从切换操作,无需VIP,支持innodb引擎,多线程复制,节点自动加入,节点修复后自动同步数据
 涉及软件:percona-xtrabackup在线热备程序   qpress递归压缩程序   Percona-XtraDB-Cluster-server集群服务程序
 3306数据库服务端口  4444 SST全量同步端口  4567集群通信端口   4568IST增量同步端口
-PXE环境搭建
+PXC环境搭建
 所有节点在/etc/hosts上必须能映射其他节点的主机名,PXC环境自带mysql
 yum -y install libev*.rpm  percona-xtrabackup*.rpm  qpress*.rpm  Percona-XtraDB-Cluster*.rpm  安装软件和依赖包
 cd   /etc/percona-xtradb-cluster.conf.d      进入配置文件目录
@@ -248,7 +249,7 @@ wsrep_node_name=pxcnode1             本机主机名(与主机解析相同)
 wsrep_sst_auth="sstuser:123qqq...A"  SST数据同步授权用户
 启动服务
 systemctl start mysql@bootstrap.service  启动集群服务(在一台节点上做)
-grep pass  /var/log/mysqld/log             查看初始密码
+grep pass  /var/log/mysqld.log             查看初始密码
 alter user root@'localhost' identified by '123456'  修改登录密码
 grant reload,lock tables,replication client,process on *.* to sstuser@'localhost' identified by '123qqq...A';  添加授权用户,与集群配置文件的一致
 现在在其他节点上启动服务systemctl start mysql(如果其他节点启动失败,检查集群配置文件,删除在节点上/var/lib/mysql下的文件再启动)
