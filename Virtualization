@@ -1,0 +1,75 @@
+Virtualzation资源管理
+虚拟化主要厂商及产品
+VMware系列:VMware,Workstation,vSphere
+Microsoft系列:VirtualPC,Hyper-V
+RedHat系列:KVM,RHEV
+Citrix系列:Xen
+Oracle:Oracle VM VirtualBox
+安装虚拟化服务平台
+必备软件: qemu-kvm,为kvm提供底层仿真支持   libvirtd-daemon,守护进程,管理虚拟机
+         libvirt-client,用户端软件       libvirt-daemon-dirver-qemu,连接qemu的驱动
+可选功能: virt-install,系统安装工具   virt-manager,图形管理工具  virt-v2v,虚拟机迁移工具  virt-p2v,物理机迁移工具
+虚拟机的组成: 内核虚拟化模块(KVM) 系统设备仿真(QEMU) 虚拟机管理程序(LIBVIRT) 一个XML文件(虚拟机配置声明文件/etc/libvirt/qemu)
+            一个磁盘镜像文件(虚拟机的硬盘/var/lib/libvirt/images)
+virsh命令工具介绍: virsh  控制命令 [虚拟机名称] [参数]
+控制命令: list [--all]                       列出虚拟机
+         start|shutdown|reboot              虚拟机启动,停止,重启
+         destroy                            强制停止虚拟机
+         define | undefine                  根据xml文件创建/删除虚拟机
+         console                            连接虚拟机的console
+         edit                               修改xml文件
+         dominfo                            查看虚拟机基本信息
+         autostart [--disable]              设置虚拟机开机自启[关闭开机自启选项]
+         domblklist                         查看虚拟机硬盘位置
+         domeiflis                          查看虚拟机网卡信息
+         net-list [--all]                   列出虚拟网络
+         net-start                          启动虚拟交换机
+         net-destory                        强制停止虚拟交换机
+         net-define                         根据xml文件创建虚拟网络 
+         net-undenfine                      删除一个虚拟网络设备
+         net-edit                           修改虚拟机的配置
+         net-autostart [--disable]          设置虚拟机交换机自启动
+        
+镜像盘类型:            RAW           QCOW2(写时复制,一开始创建为软连接映射,需要修改时把后端盘部分数据复制过来,后端盘不可修改)
+      KVM默认         否              是
+      I/O效率         高             较高
+      占用空间         大              小
+      压缩            no             yes
+      后端盘复用       no             yes
+      快照            no             yes
+qemu-img命令格式: qemu-img  命令  参数  块文件名称  大小(默认2G)
+常用命令: create  -f  qcow2            创建一个镜像盘(-f 格式) 
+         create  -b 后端盘 -f qcow2    基于后端盘新建镜像盘
+         convert                      转换磁盘格式
+         info                         查看镜像盘文件信息  
+         resize  镜像名   大小          修改镜像大小
+         
+虚拟机复制步骤
+cd /var/lib/libvirt/images/                                 进入磁盘目录
+qemu-img create -b .node_base.qcow2 -f qcow2 DIY.img 2G     基于后端盘创建磁盘
+cp .node_base.xml  /etc/libvirt/qemu/DIY.xml                复制描述文件
+vim /etc/libvirt/qemu/DIY.xml                               修改描述文件
+9    <name>DIY</name>                                       定义名字
+11   <memory unit='KiB'>4417969</memory>                    定义分配内存
+12   <currentMemory unit='KiB'>4417969</currentMemory>      定义可用内存
+13   <vcpu placement='static'>4</vcpu>                      定义cpu核数
+33   <source file='/var/lib/libvirt/images/DIY.img'/>       定义镜像文件
+virsh define /etc/libvirt/qemu/DIY.xml                      以xml文件创建虚拟机
+virsh start DIY                                             启动虚拟机
+
+virsh扩容磁盘
+virsh dombliklist 虚拟机名            查看虚拟机磁盘路径
+virsh blockresize --path [磁盘绝对路径] --size 大小 虚拟机名     重新定义虚拟机磁盘容量
+虚拟机操作
+lsblk                                查看磁盘设备多余空间
+growpart /dev/vda  1                 作磁盘扩容(1代表第一个分区)
+xfs_growfs  /                        扩容文件系统
+df -h                                查看挂载信息
+
+
+
+
+
+
+
+
