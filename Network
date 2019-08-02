@@ -1,11 +1,8 @@
 网络功能：数据通讯，资源共享，提高可靠，提高系统处理能力
-
 标准化组织：ISO国际标准化组织　　　IEEE电气和电子工程师学会
-
 网络拓扑结构：点对点，星型及扩展的星型，网状
-
+MAC地址（硬件地址），全球唯一，不可更改.长度48位，前24位记录了厂商标识，后24位记录了序列号
 osi七层参考模型（理论框架）：物理层，数据链路层，网络层，传输层，会话层，表示层，应用层
-
 TCP/IP/五层模型　　　　　　　　　实际使用　　　　　　　　　　　PDU协议数据单元
 应用层                           PC                        
 传输层                         防火墙                   数据段（TCP UDP）
@@ -13,19 +10,18 @@ TCP/IP/五层模型　　　　　　　　　实际使用　　　　　　　�
 数据链路层                     交换机                   数据帧(VLAN TRUNK MSTP)
 物理层                         网卡                     比特流
 
-MAC地址（硬件地址），全球唯一，不可更改.长度48位，前24位记录了厂商标识，后24位记录了序列号
-
 TCP传输控制协议,可靠的,面向连接的协议,传输率低
-封装格式:        源端口号                                                    目标端口号
+封装格式:        源端口号                         |                           目标端口号
                                             32位序列号
                                             32位确认号
-4位首部长度|保留6位|URG|ACK|PSH|PST|SYN|FIN                                16位窗口大小    
-             16位校验和                                                   16位紧急指针
+4位首部长度|保留6位|URG|ACK|PSH|PST|SYN|FIN       |                        16位窗口大小    
+             16位校验和                          |                         16位紧急指针
                                              可选项
                                               数据
+
 UDP用户数据报协议,不可靠的,无连接的服务,传输率高
-封装格式:         16位源端口号            16位目标端口号
-                16位UDP长度             16位UDP校验和
+封装格式:         16位源端口号    |      16位目标端口号
+                16位UDP长度     |        16位UDP校验和
                               数据
 UDP的流控和差错控制
 UDP缺乏可靠机制,UDP只有校验和来提供差错控制,需要上层协议来提供差错控制
@@ -38,7 +34,19 @@ TCP应用
 UDP应用
 69TFTP简单文件传输协议  53DNS域名服务  123NTP网络时间协议
 
-eNSP软件
+linux配置ip地址
+vim /etc/sysconfig/network-scripts/ifcfg-网卡名      直接修改配置文件(硬核通用版本)
+DEVICE="eth0"               驱动名称,与ifconfig看到的名称一致
+ONBOOT="yes"                开机启动
+NM_CONTROLLED="no"          不接受NetworkManager控制
+TYPE="Ethernet"             类型
+BOOTPROTO="static"          协议(dhcp|static|none)
+IPADDR="192.168.1.50"       IP地址
+NETMASK="255.255.255.0"     子网掩码
+GATEWAY="192.168.1.254"     默认网关
+
+
+华为eNSP软件
 <Huawei>system-view             //进入系统视图
 [Huawei]interface Ethernet0/0/1    //进入接口视图
 [Huawei-Ethernet0/0/1]quit    //返回上一视图
@@ -65,7 +73,6 @@ console0]authentication-mode aaa                 激活配置
 广播,对除了源的接口发广播信息
 转发,根据mac地址表转发数据帧
 更新,300秒无通讯会清除其mac地址记录;关机或者换接口会立刻删除mac记录
-
 交换机作用：广播控制，增强安全性，提高带宽利用，降低延迟
 >display  current-configuration   查看交换机配置
 ]display-address                  查看mac地址列表
@@ -83,6 +90,9 @@ clear configuration interface  e 0/0/1  清除端口配置(清除后要激活端
 ]interface Eth-Trunk *            新建链路聚合*
 trunkport Etherent   0/0/7  0/0/8  把端口拉进链路聚合*
 interface vlanif *                给vlan*建立虚拟接口,可配ip(用于三层交换机,可在虚拟接口中配置路由)
+交换机STP生成树协议功能  
+逻辑上断开环路,防止广播风暴的生成,一般高级交换机自带,傻瓜机没有
+STP enable/disable   开启/关闭功能(默认开启)
 
 华为路由器配置命令
 让不同网段之间通讯
@@ -103,7 +113,6 @@ acl*]rule  deny/permit  source  IP   0/any      限制/允许来源IP
 ]acl *                        新建acl域(3000-3999)
 acl*]rule  deny/permit  传输协议  source  来源IP  0/any  destination 目标IP destination-port  eq   服务端口   
 /0/1]traffic-filter inbound/outbount acl 3000    接口选择acl域(进或出)
-
 NAT转换
 可以将内网的私有IP地址与公有IP进行转换
 私有IP地址范围  A:10.0.0.0 - 10.255.255.255
@@ -115,10 +124,6 @@ Easy IP:多对一,单向,出门时生成临时端口号
 acl *         定义ACL号
 rule permit  soure  网段  反掩码   制定ACL表规则 ( rule permit source any 使用acl定义任何内部地址)
 接口视图下 nat  outbount  acl号    把ACL表拉进接口
-
-交换机STP生成树协议功能  
-逻辑上断开环路,防止广播风暴的生成,一般高级交换机自带,傻瓜机没有
-STP enable/disable   开启/关闭功能(默认开启)
 
 VRRP
 将多台路由器虚拟成一个虚拟路由器,实现网关备份
