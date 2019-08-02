@@ -12,7 +12,8 @@ echo > /var/log/wtmp或btmp     清除用户登录信息
 su -  -c "命令" 用户            以其他用户执行命令
 sysctl -a     查看所有内核参数
 echo 1 > /proc/sys/net/ipv4/ip_forward  &&  sysctl -p  开机内核路由转发功能
-arp -a        查看本机缓存记录的MAC地址
+arp -a        查看本机缓存记录的MAC地址(多用于交换机)
+lsmod         查看内核模块
 
 进程管理
 树型结构,父进程与子进程,僵尸进程,孤儿进程
