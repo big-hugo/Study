@@ -42,7 +42,7 @@ qemu-img命令格式: qemu-img  命令  参数  块文件名称  大小(默认2G
          create  -b 后端盘 -f qcow2    基于后端盘新建镜像盘
          convert                      转换磁盘格式
          info                         查看镜像盘文件信息  
-         resize  镜像名   大小          修改镜像大小
+         resize  镜像名   [+|-]大小     修改镜像大小
          
 虚拟机复制步骤
 cd /var/lib/libvirt/images/                                 进入磁盘目录
