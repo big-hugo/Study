@@ -16,3 +16,4 @@ server 192.168.5.1 iburst           与192.168.5.1的服务器同步时间(iburs
 systemctl  restart  chronyd         重启服务
 systemctl  enable  chronyd          开机自启动服务
 date                                再次查看时间
+chronyc sources -v                  验证同步是否成功(最后一行有*则成功)
