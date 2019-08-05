@@ -1,4 +1,6 @@
 cal  1752     查看年历
+man  命令     查看帮助手册
+命令 --help   查看帮助手册  
 route -n      查看路由表
 route add/del default gw 192.168.2.51     添加/删除网关
 echo "/usr/local/nginx/sbin/nginx" >> /etc/rc.local   设定开机自启的命令
@@ -16,6 +18,18 @@ free -h       带单位显示内存
 arp -a        查看本机缓存记录的MAC地址(多用于交换机)
 lsmod         查看内核模块
 watch -n 1 '命令'              每1秒钟显示命令
+
+
+
+
+
+screen分屏工具
+screen                      进入可分屏模式
+ctrl+a  shift+s             横屏分割
+ctrl+a  shift+|             竖屏分割
+ctrl+a   tab键              切换窗口ctrl+a 
+ctrl+a    c                 打开编译器
+ctrl+a    d                 退出所有分屏
 
 进程管理
 树型结构,父进程与子进程,僵尸进程,孤儿进程
