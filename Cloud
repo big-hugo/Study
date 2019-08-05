@@ -83,16 +83,27 @@ apachectl graceful                                    重新载入配置文件
 source ~/keystonerc_admin                             初始化环境变量
 env | grep OS                                         查看网站登录用户名密码
 openstack help                                        可查看帮助
+现在,客户端可以通过访问openstack的ip地址来访问服务页面 
 
-
-
-
-
-
-
-
-
-
+Openstack命令行管理项目
+source ~/keystonerc_admin                             初始化环境变量(进入命令行才能编译以下命令)
+openstack project create 项目名                        创建项目
+openstack project list                                列出所有项目
+openstack project show 项目名                          查看项目详细信息
+openstack project set --disable/enable 项目名          禁用与启用项目
+nova quota-show --tenant 项目名                        查看项目配额
+nova quota-update --cores 30 项目名                    更新可用vcpu数目为30
+openstack project delete 项目名                        删除项目
+openstack user create --password 密码 用户名           创建用户密码
+openstack user set --email 用户@邮箱                   设置用户的email地址
+openstack user list                                   列出所有用户
+openstack user show 用户名                             查看用户信息
+openstack role add --user 用户名 --project 项目名 角色名       指定用户可以以指定角色访问项目
+openstack role list --project 角色名 --user 用户名      查看用户中的角色
+openstack user set --disable/enable  用户名            禁用与启用用户
+openstack user set --password 密码 用户名               修改用户密码
+openstack role remove --project 项目名 --user 用户名 角色名     将用户角色从项目中删除
+openstack user delete 用户名                           删除用户
 
 
 
