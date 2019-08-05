@@ -15,6 +15,7 @@ echo 1 > /proc/sys/net/ipv4/ip_forward  &&  sysctl -p  开机内核路由转发�
 free -h       带单位显示内存
 arp -a        查看本机缓存记录的MAC地址(多用于交换机)
 lsmod         查看内核模块
+watch -n 1 '命令'              每1秒钟显示命令
 
 进程管理
 树型结构,父进程与子进程,僵尸进程,孤儿进程
