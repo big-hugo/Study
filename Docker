@@ -1,0 +1,38 @@
+Docker容器
+容器技术已经成为应用程序封装和交付的核心技术,由资源管理,进程隔离,selinux安全组成
+容器与虚拟机类似,但容器不是虚拟机,启动一个容器可以像启动一个进程一样快速,更加简洁高效
+容器运行的进程真机可查,虚拟机运行的进程真机不可查,容器使用共享公共库和程序
+Docker是完整的一套容器管理系统
+Docker容器的隔离性没有虚拟化强,共用linux内核,安全性先天缺陷
+Docker中容器时基于镜像启动的,镜像时启动容器的核心,采用分层设计,用COW技术确保底层数据不丢失
+
+安装软件
+yum -y install docker             安装docker软件
+systemctl restart docker          启动docker软件
+systemctl enable docker           设置开机自启动
+
+Docker hub镜像仓库
+docker images                     查看本机docker镜像  (名称 标签 ID 创建时间 大小)
+docker search   软件名             查看docker官网提供的镜像仓库
+docker pull     下载路径           下载ocker官网提供的镜像
+docker push     上传路径           上传镜像到docker官网
+docker save 镜像名称:标签 -o 文件名.tar        导出(备份)镜像 ,生成的文件类型为tar包
+docker load -i  文件名                       导入(还原)镜像,用导出tar包 
+docker run -it  镜像名称:标签 /bin/bash       启动镜像生成一个容器(/bin/bash指容器里的路径,不添加则执行镜像里的默认命令,-itd后台运行)
+docker history                    查看镜像制作历史
+docker inspect                    查看镜像底层信息("Env":环境变量;"Cmd":系统默认命令)
+docker rmi 镜像名称:标签            删除本地镜像(也可以根据ID)
+docker tag 镜像名称:标签  新镜像名:新标签       新建修改名称标签后的镜像
+docker ps  [-a] [-q]                        查看运行中容器(-a查看所有容器,-q查看指定容器)
+docker stop/start/restart  容器ID           关闭/开启/重启容器
+docker attach   容器ID            连接容器(exit退出会杀死父进程,容器会关闭;按ctrl+p+q退出)
+docker exec -it 容器ID  /bin/bash           连接容器(exit退出容器不会关闭)
+docker top      容器ID            查看容器进程列表
+docker rm [-f]  容器ID            删除容器(-f强制删除)
+
+
+
+
+redhat           debian
+rpm               dpkg
+yum              apt.get
