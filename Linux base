@@ -1,6 +1,7 @@
 cal  1752     查看年历
 man  命令     查看帮助手册
-命令 --help   查看帮助手册  
+命令 --help   查看帮助手册 
+file  文件    查看文件类型
 route -n      查看路由表
 route add/del default gw 192.168.2.51     添加/删除网关
 echo "/usr/local/nginx/sbin/nginx" >> /etc/rc.local   设定开机自启的命令
@@ -18,9 +19,6 @@ free -h       带单位显示内存
 arp -a        查看本机缓存记录的MAC地址(多用于交换机)
 lsmod         查看内核模块
 watch -n 1 '命令'              每1秒钟显示命令
-
-
-
 
 
 screen分屏工具
