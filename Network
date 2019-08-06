@@ -44,7 +44,7 @@ BOOTPROTO="static"          协议(dhcp|static|none)
 IPADDR="192.168.1.50"       IP地址
 NETMASK="255.255.255.0"     子网掩码
 GATEWAY="192.168.1.254"     默认网关
-
+systemctl restart network   重启网络服务
 
 华为eNSP软件
 <Huawei>system-view             //进入系统视图
