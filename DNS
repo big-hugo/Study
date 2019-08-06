@@ -1,0 +1,48 @@
+DNS域名解析服务器
+正向解析:把域名解析成IP     反向解析:把IP解析成域名(不常用)
+根域名   .
+一级域名   .cn  .us  .tw  .jp  .kr  .hk ...
+二级域名   .tedu.cn  .com.cn  .net.cn  ...
+FQDN完全合格主机名:主机头部+域名
+nslookup 域名           把域名解析成IP地址
+  
+搭建DNS服务
+软件:bind,bind-chroot    服务:named   默认端口:TCP/UDP 53
+运行时的虚拟根环境:/var/named/chroot
+主要执行程序:/usr/sbin/named
+主配置文件:/etc/named.conf      设置负责解析域名(复制时-p连同属性复制)
+地址库文件模板:/var/named/named.loclahost        记录域名与IP对应关系(复制时-p连同属性复制)
+vim /etc/named.conf           主配置文件解析
+options {
+        listen-on port 53 { 127.0.0.1; };      监听地址和端口
+        directory       "/var/named";          地址文件的默认位置
+        allow-query     { localhost; }; }      允许任何客户机查询
+zone "tedu.cn" IN {           设置复制解析的域名                  
+        type master;          类型为主DNS服务器
+        file "tedu.cn.zone";};地址库文件名称
+include "/etc/named.rfc1912.zones";             可载入其他配置
+named-checkconf   /etc/named.conf               检查主配置文件语法
+vim  /var/named/tedu.cn.zone   地址库文件解析(复制/var/named/named.localhost,-p)
+$TTL 1D                        生存时间 
+@  IN SOA  @ rname.invalid. (    SOA:授权信息开始  @:区域名   rname.invalid.:区域管理邮箱
+           ...     )
+@       IN    NS    svr7.tedu.cn.   本机的 主机头部+域名,结尾记得加.
+svr7    IN    A     192.168.4.31    正向地址解析本机主机名IP
+pc207   IN    A     192.168.4.207   正向解析其他地址
+www     IN    A     192.168.4.100                                 
+$GENERATE  1-50 pc$ A 192.168.10.$  解析记录别名        
+        
+客户机指定DNS服务器
+/etc/hosts                     主机名映射文件,最高优先级,只为本机解析
+vim   /etc/resolv.conf         DNS服务器配置文件
+nameserver  DNS服务器地址        指定DNS服务器  
+
+
+
+
+
+
+
+
+
+  
