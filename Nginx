@@ -153,14 +153,23 @@ vim /etc/security/limits.conf              永久设置软/硬限制
 优化Nginx数据包头缓存(优化414错误)
 vim  /usr/lcoal/nginx/conf/nginx.conf      修改配置文件
 http{ client_header_buffer_size 1K;        默认包头信息缓存
-      large_client_header_buffers 4 4K;}   最大缓存个数和容量       
+      large_client_header_buffers 4 4K;}   最大缓存个数和容量  
+      
+优化Nginx静态页面缓存时间
+vim  /usr/lcoal/nginx/conf/nginx.conf      修改配置文件
+server{... 
+      localtion ~* \.(jpg|gif|png|xml)${   匹配URL结尾 
+       expires     30d;         }          定义客户端缓存时间30天
+}
+在firefox浏览器输入about:cache可查看缓存信息
 
-
-
-
-
-
-
+Nginx日志切割
+#!/bin/bash
+date=`date+%Y%m%d`                          定义变量为当前时间
+logpath=/usr/local/nginx/logs               定义日志路径
+mv $logpath/access.log $logpath/access.$date.log      重任名访问日志
+mv $logpath/error.log $logpath/error.$date.log        重任名错误日志
+kill -USR1 $(cat $logpath/nginx.pid)        生产新的日志文件
 
 
 
