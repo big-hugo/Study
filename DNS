@@ -29,19 +29,26 @@ $TTL 1D                        生存时间
 @       IN    NS    svr7.tedu.cn.   本机的 主机头部+域名,结尾记得加.
 svr7    IN    A     192.168.4.31    正向地址解析本机主机名IP
 pc207   IN    A     192.168.4.207   正向解析其他地址
-www     IN    A     192.168.4.100                                 
-$GENERATE  1-50 pc$ A 192.168.10.$  解析记录别名        
+*       IN    A     192.168.4.100   *代表任何                              
+$GENERATE  1-50 pc$ A 192.168.10.$  解析记录别名  
+named-checkzone 域名 配置文件         检查配置文件语法
+
         
 客户机指定DNS服务器
 /etc/hosts                     主机名映射文件,最高优先级,只为本机解析
 vim   /etc/resolv.conf         DNS服务器配置文件
 nameserver  DNS服务器地址        指定DNS服务器  
 
+DNS子域授权
+主机A负责qq.com的解析   主机B负责gz.qq.com的解析
+vim  A主机的/var/named/qq.com.zone
+qq.com.       IN   NS    A主机名
+gz.qq.com.    IN   NS    B主机名
+A主机名        IN   A     A主机IP    
+B主机名        IN   A     B主机IP
 
-
-
-
-
+递归查询:主DNS服务器没有,往下级寻找,下级找不到再找下级
+迭代查询:主DNS服务器去每个根服务器访问直到有结果
 
 
 
