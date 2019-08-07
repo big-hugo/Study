@@ -49,7 +49,50 @@ B主机名        IN   A     B主机IP
 
 递归查询:主DNS服务器没有,往下级寻找,下级找不到再找下级
 迭代查询:主DNS服务器去每个根服务器访问直到有结果
+vim /etc/named.conf       修改配置文件
+options { recursion no;   禁止递归查询
 
-
-
+DNS缓存服务器,缓存解析记录加快解析,记录保留48小时,初次解析因为要记录所以会变慢
+vim /etc/named.conf       修改配置文件
+options {  forwarders { 公共DNS的IP ;     转发给公网缓存服务器
   
+Split分离解析(视图解析)
+为不同的客户端提供不同解析
+vim /etc/named.conf       修改配置文件
+view  "视图1" {
+    match-clients { 客户机地址1; .. .. ; };          //匹配第1类客户机地址
+    zone "目标域名" IN {                              //同一个DNS区域
+        type master;
+        file "地址库1";                             //第1份地址库 
+        };
+};
+view  "视图2" {
+    match-clients { 客户机地址2; .. .. ; };          //匹配第2类客户机地址
+    match-clients { any; };                          //匹配任意地址
+    zone "目标域名" IN {                              //同一个DNS区域
+        type master;
+        file "地址库2";                             //第2份地址库
+    };
+};
+.. ..
+view  "视图n" {
+    match-clients { any; };                          //匹配任意地址
+    zone "目标域名" IN {                              //同一个DNS区域
+        type master;
+        file "地址库n";                             //第n份地址库
+    };
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
