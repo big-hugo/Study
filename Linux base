@@ -69,11 +69,21 @@ ftp> lcd    目录      进入本地目录
 ftp> put    文件      上传文件(需要解开selinux限制)setsebool -P ftpd_anon_write on && setsebool -P ftpd_full_access on
 ftp> get    文件      下载文件
 
-
-
-
-
-
+nfs文件共享
+服务端配置
+yum -y install nfs-utils
+vim /etc/export
+共享目录    *(ro)     定义共享目录,*为可访问网段,ro为只读,rw为读写  
+systemctl start nfs-server         启动服务
+systemctl enbale nfs-server        设置开机自启
+exportfs  -rv                      查看自身共享的目录
+客户端配置
+yum -y install nfs-utils
+systemctl start nfs-server         启动服务
+systemctl enbale nfs-server        设置开机自启
+showmount -e 服务端IP               查看服务端共享的目录
+vim /etc/fstab                     写入文件实现永久挂载
+服务端ip:共享目录  自身挂载点 nfs _netdev 0 0     写入挂载信息
 
 
 
