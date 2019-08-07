@@ -29,6 +29,43 @@ docker attach   容器ID            连接容器(exit退出会杀死父进程,�
 docker exec -it 容器ID  /bin/bash           连接容器(exit退出容器不会关闭)
 docker top      容器ID            查看容器进程列表
 docker rm [-f]  容器ID            删除容器(-f强制删除)
+docker commit   容器ID   镜像名称:标签        自定义镜像,把配置好的容器另存为镜像
+docker build -t 镜像名:标签  Dockerfile所在目录    根据Dockerfile生成镜像
+
+创建Dockerfile文件
+mkdir bulid;cd bulid                       新建目录并进入目录操作
+vim Dockerfile                             创建Dockerfile文件,下面为示例
+例子1:
+FROM docker.io/centos:latest               基于该镜像
+RUN rm -f /etc/yum/repos.d/*.repo          执行该命令
+ADD rr.repo /etc/yum.repos.d/local.repo    复制文件到镜像
+RUN yum install -y net-tools vim iproute psmisc
+例子2:
+FROM test2:lastest                         基于该镜像
+RUN yum -y install httpd bash-completion   执行安装软件命令
+WORKDIR /var/www/html                      选择工作目录
+RUN echo 'hello nsd1904' > index.html      执行命令修改主页面
+EXPOSE 80                                  设置开放端口
+CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
+
+Dockerfile语法格式：
+– FROM:基础镜像
+– MAINTAINER:镜像创建者信息(说明)
+– EXPOSE:开放的端口
+– ENV:设置环境变量
+– ADD:复制文件到镜像
+– RUN:制作镜像时执行的命令,可以有多个
+– WORKDIR:定义容器默认工作目录
+– CMD:容器启动时执行的命令,仅可以有一条CMD
+
+
+
+
+
+
+
+
+
 
 
 
