@@ -11,7 +11,7 @@ yum -y install docker             安装docker软件
 systemctl restart docker          启动docker软件
 systemctl enable docker           设置开机自启动
 
-Docker hub镜像仓库
+Dockerhub镜像仓库
 docker images                     查看本机docker镜像  (名称 标签 ID 创建时间 大小)
 docker search   软件名             查看docker官网提供的镜像仓库
 docker pull     下载路径           下载ocker官网提供的镜像
@@ -25,14 +25,16 @@ docker rmi 镜像名称:标签            删除本地镜像(也可以根据ID)
 docker tag 镜像名称:标签  新镜像名:新标签       新建修改名称标签后的镜像
 docker ps  [-a] [-q]                        查看运行中容器(-a查看所有容器,-q查看指定容器)
 docker stop/start/restart  容器ID           关闭/开启/重启容器
+docker stop $(docker ps -aq)               关闭所有容器  
 docker attach   容器ID            连接容器(exit退出会杀死父进程,容器会关闭;按ctrl+p+q退出)
 docker exec -it 容器ID  /bin/bash           连接容器(exit退出容器不会关闭)
 docker top      容器ID            查看容器进程列表
 docker rm [-f]  容器ID            删除容器(-f强制删除)
+docker rm $(docker ps -aq)                  删除所有容器
 docker commit   容器ID   镜像名称:标签        自定义镜像,把配置好的容器另存为镜像
 docker build -t 镜像名:标签  Dockerfile所在目录    根据Dockerfile生成镜像
 
-创建Dockerfile文件
+创建Dockerfile文件,创建docker镜像
 mkdir bulid;cd bulid                       新建目录并进入目录操作
 vim Dockerfile                             创建Dockerfile文件,下面为示例
 例子1:
@@ -46,8 +48,8 @@ RUN yum -y install httpd bash-completion   执行安装软件命令
 WORKDIR /var/www/html                      选择工作目录
 RUN echo 'hello nsd1904' > index.html      执行命令修改主页面
 EXPOSE 80                                  设置开放端口
-CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
-
+CMD ["/usr/sbin/httpd", "-DFOREGROUND"]    容器启动时启动服务,分开需要格式
+docker build -t 镜像名:标签  Dockerfile所在目录    根据Dockerfile生成镜像
 Dockerfile语法格式：
 – FROM:基础镜像
 – MAINTAINER:镜像创建者信息(说明)
@@ -58,16 +60,40 @@ Dockerfile语法格式：
 – WORKDIR:定义容器默认工作目录
 – CMD:容器启动时执行的命令,仅可以有一条CMD
 
+自定义私有镜像仓库
+yum -y install docker-distribution              安装软件
+systemctl start docker-distribution.service     启动服务
+systemctl enable docker-distribution.service    设置开机自启
+/etcdocker-distribution/registry/config.yml     仓库配置文件
+/var/libregistry                                数据存储路径
+curl 自身IP:5000/v2                     访问自身5000端口的v2文件(正确则输出:<a href="/v2/">Moved Permanently</a>.)
+vim /etc/sysconfig/docker                       修改配置文件
+13 ADD_REGISTRY='--add-registry 自身IP:5000'     指定自身IP:端口
+24 INSECURE_REGISTRY='--insecure-registry 自身IP:5000'         自身IP:端口
+systemctl restart docker                        重启docker服务
+docker tag 镜像名称:标签  自身IP:5000/镜像名:新标签  新建修改名称标签后的镜像
+docker push 自身IP:5000/镜像名:新标签              上传改名后镜像到自身私有仓库
+curl IP:5000/v2/_catalog                        查看私有镜像仓库中的镜像名称
+curl IP:5000/v2/镜像名/tags/list               查看某镜像的标签
+客户端连接私有仓库
+vim /etc/sysconfig/docker                       修改配置文件
+13 ADD_REGISTRY='--add-registry 仓库IP:5000'    指定私有仓库的IP:端口
+24 INSECURE_REGISTRY='--insecure-registry 仓库IP:5000'      指定私有仓库的IP:端口
+systemctl restart docker                        重启docker服务
+curl IP:5000/v2/_catalog                        查看私有镜像仓库中的镜像名称
+curl IP:5000/v2/镜像名/tags/list                 查看某镜像的标签
+docker run -it 仓库IP:5000/镜像名:标签            运行私有仓库上的镜像
 
+docker存储卷
+docker容器不保持任何数据,重要数据用概不卷存储,容器可以挂载真机的目录或共享文件
+docker run -v 真机目录:容器内挂载目录  -it 镜像名称:标签     把真机目录挂载到容器中
 
-
-
-
-
-
-
-
-
+docker网络
+docker network  list        查看容器虚拟交换机
+docker network create --subnet=网段/24 虚拟交换机名称      创建容器虚拟交换机
+brctl show 虚拟交换机名称      启动容器会绑定该网桥
+docker run --network=虚拟交换机名称 -itd 镜像名:标签        指定网络运行镜像
+docker run -it -p 真机端口:容器端口 镜像名:新标签            把真机的端口被容器占用
 
 
 redhat           debian
