@@ -121,7 +121,9 @@ server {     listen *;                      监听端口
 
 
 自定义报错页面  
-error_page  404  /404.html;      提前准备404.html
+http{  fastcgi_intercept_errors on;         错误页面重定向
+server{
+error_page  404  /404.html;      自定义错误页面,提前准备404.html
 401 账户密码错误    403 禁止访问    404 找不到页面   414  url头部过长     502  bad gateway
 
 
@@ -138,14 +140,20 @@ server accepts handled requests
  1 1 1                                      已接受总数量  已处理总数量   客户端发送请求数量
 Reading: 0 Writing: 1 Waiting: 0            正在读取数量  正在响应数量   正在等待响应数量
 
+Nginx并发量优化
+ab -c 并发数 -n 总请求数 URL                  并发量压力测试
+vim  /usr/lcoal/nginx/conf/nginx.conf      修改配置文件
+worker_processes;                          与CPU核心数一致
+events{  worker_connections 65535; }       每个worker最大并发连接数
+ulimt  -a                                  查看内核所有属性值
+ulimit -Hn/-Sn   限制值                     临时设置硬/软限制
+vim /etc/security/limits.conf              永久设置软/硬限制
+*   soft/hart  nofile  限制值               用户或组 软/硬 项目 限制值
 
-
-
-
-
-
-
-
+优化Nginx数据包头缓存(优化414错误)
+vim  /usr/lcoal/nginx/conf/nginx.conf      修改配置文件
+http{ client_header_buffer_size 1K;        默认包头信息缓存
+      large_client_header_buffers 4 4K;}   最大缓存个数和容量       
 
 
 
