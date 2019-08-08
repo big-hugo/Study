@@ -61,10 +61,10 @@ Split分离解析(视图解析)
 vim /etc/named.conf       修改配置文件
 view  "视图1" {            自定义视图名称
     match-clients { 客户机地址1; .. .. ; };          //匹配第1类客户机地址
-    zone "目标域名" IN {                              //同一个DNS域名
+    zone "tedu.cn" IN {                              //同一个DNS域名
         type master;
         file "地址库1";     };                       //第1份地址库 
-     zone "目标域名2" IN {                          //同一个DNS域名
+     zone "qq.com" IN {                          //同一个DNS域名
         type master;
         file "地址库2";      };   };                 //第1份地址库 
 view  "视图2" {             自定义视图名称
