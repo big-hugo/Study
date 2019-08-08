@@ -45,9 +45,17 @@ IPADDR="192.168.1.50"       IP地址
 NETMASK="255.255.255.0"     子网掩码
 GATEWAY="192.168.1.254"     默认网关
 systemctl restart network   重启网络服务
-方法2:nmcli connection modify '网卡名' ipv4.method manual ipv4.addresses 'IP/网段 网关' ipv4.dns dns connection.autoconnect yes    永久配置IP(redhat7.0以上支持)
+方法2:nmcli connection modify '网卡名' ipv4.method manual ipv4.addresses 'IP/掩码 网关' ipv4.dns dns connection.autoconnect yes    永久配置IP(redhat7.0以上支持)
 nmcli connection up '网卡名'       激活网卡
 方法3:nmtui                 图形界面配置IP
+
+IPV6地址,128个二进制位数,冒号分隔十六进制数,段内连续多个0可简写为::,子网掩码都为/64
+
+linux链路聚合配置(又名:聚合链路 网卡绑定)
+提高网卡设备的可靠性,提高冗余
+nmcli connection add type team con-name 配置文件名 ifname 聚合网卡名 autoconnect yes config '{"runner":{"name":"activebackup"}}'    新建虚拟网卡
+nmcli connection add type team-slave con-name 配置文件名 ifname 从属网卡名 master 聚合网卡名    添加从属网卡
+teamdctl 聚合网卡名 state     查看聚合网卡
 
 华为eNSP软件
 <Huawei>system-view             //进入系统视图
