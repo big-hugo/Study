@@ -1,0 +1,72 @@
+Apache
+搭建web,基于B/S架构,有http和html协议
+yum -y install httpd    安装软件
+vim /etc/httpd/conf/httpd.conf      主配置文件路径
+119 DocumentRoot "/var/www/html"    默认网页目录路径
+124 <Directory "/var/www">          权限路径,改变权限路径需要把selinux改为宽松,或者修改目录上下文值
+127     Require all denied/granted   拒绝/允许所有人访问
+128 </Directory>
+
+目录权限路径可通过调用配置文件修改
+vim /etc/httpd/conf.d/*.conf        创建调用配置文件,会覆盖主配置文件
+<Directory /var/www/html/private>
+        Require ip 127.0.0.1 ::1 172.25.0.11     仅允许本机访问
+</Directory>
+systemctl restart httpd             重启服务
+SElinux三大策略: 布尔值  安全上下文 非默认端口的开放
+ls -Zd  目录                          查看目录标签值
+chcon -R --reference=源目录标签值 目的目录    把原目录标签值赋给目的目录
+semange port -l | grep http                查看http支持的默认端口
+semanage port -a -t http_port_t -p tcp 8909       端口突破 SELinux 限制
+ 
+虚拟web主机,实现同一服务器访问不同网页
+可以基于端口,域名或IP建立虚拟主机
+vim /etc/httpd/conf.d/*.conf        创建调用配置文件,会覆盖主配置文件
+<VirtualHost 自身IP:端口>             定义虚拟主机的IP和端口(IP一般为*,自身所有IP,端口一般为80)
+      ServerName     域名
+      DocumentRoot   网页目录
+</VirtualHost>
+systemctl restart httpd             重启服务
+使用web虚拟主机一旦启用,所有网页必须使用web虚拟主机,直接访问web服务器IP会显示第一个页面,优先级由上到下,端口>域名
+
+页面跳转(又名页面别名 地址重写)
+<VirtualHost *:端口>                
+        ServerName      域名
+        DocumentRoot    网页目录
+        Alias /地址栏结尾 跳转网页绝对路径      页面跳转
+</VirtualHost>
+
+配置安全web服务(ssl)
+yum -y install mod_ssl              安装服务模块
+/etc/pki/tls/certs                  根证书和网站证书下载地址
+/etc/pki/tls/pirvate                私钥下载地址
+vim /etc/httpd/conf.d/ssl.conf      编辑安全配置文件
+<VirtualHost _default_:443>
+DocumentRoot "/var/www/html"        //设置站点根目录
+ServerName server0.example.com:443  //设置站点名称
+.. ..
+SSLCertificateFile /etc/pki/tls/certs/server0.crt       网站证书路径
+SSLCertificateKeyFile /etc/pki/tls/private/server0.key  私钥路径
+SSLCACertificateFile /etc/pki/tls/certs/example-ca.crt  根证书路径
+</VirtualHost>
+systemctl restart httpd             重启服务
+用https://访问
+
+实现动态web内容
+yum  -y  install   mod_wsgi       安装对应的支持模块
+vim /etc/httpd/conf.d/*.conf      创建调用配置文件,会覆盖主配置文件
+<VirtualHost *:端口>                
+        ServerName      域名
+        DocumentRoot    网页目录
+        WSGIScriptAlias /地址栏结尾 网页绝对路径      用WSGIScriptAlias跳转
+</VirtualHost>
+
+
+
+
+
+
+
+
+
+
