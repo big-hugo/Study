@@ -11,14 +11,18 @@ Oracle:Oracle VM VirtualBox
 可选功能: virt-install,系统安装工具   virt-manager,图形管理工具  virt-v2v,虚拟机迁移工具  virt-p2v,物理机迁移工具
 虚拟机的组成: 内核虚拟化模块(KVM) 系统设备仿真(QEMU) 虚拟机管理程序(LIBVIRT) 一个XML文件(虚拟机配置声明文件/etc/libvirt/qemu)
             一个磁盘镜像文件(虚拟机的硬盘/var/lib/libvirt/images)
+启动服务: libvirtd
 virsh命令工具介绍: virsh  控制命令 [虚拟机名称] [参数]
 控制命令: list [--all]                       列出虚拟机
+         net-list [--all]                   列出虚拟网络
          start|shutdown|reboot              虚拟机启动,停止,重启
          destroy                            强制停止虚拟机
          define | undefine                  根据xml文件创建/删除虚拟机
          console                            连接虚拟机的console
          edit                               修改xml文件
+         dumpxml                            查看虚拟机配置文件
          dominfo                            查看虚拟机基本信息
+         nodeindo                           查看真机信息
          autostart [--disable]              设置虚拟机开机自启[关闭开机自启选项]
          domblklist                         查看虚拟机硬盘位置
          domeiflis                          查看虚拟机网卡信息
@@ -43,6 +47,7 @@ qemu-img命令格式: qemu-img  命令  参数  块文件名称  大小(默认2G
          convert                      转换磁盘格式
          info                         查看镜像盘文件信息  
          resize  镜像名   [+|-]大小     修改镜像大小
+guestmount -a 磁盘路径 -i 挂载点         离线挂载磁盘,可以修改磁盘中文档(清除/etc/passwd中的密码可以无密码登录)         
          
 虚拟机复制步骤
 cd /var/lib/libvirt/images/                                 进入磁盘目录
