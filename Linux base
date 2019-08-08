@@ -19,7 +19,20 @@ free -h       带单位显示内存
 arp -a        查看本机缓存记录的MAC地址(多用于交换机)
 lsmod         查看内核模块
 watch -n 1 '命令'              每1秒钟显示命令
+uuidgen       生成一个系统唯一的ID
+!.n           执行历史中第n条命令
+!str          执行上一条以str开头的命令
+ln -s  源文件  快捷方式文件       生成软连接(去-s为生成硬连接)
+zip -r 备份名称.zip  被归文档     zip压缩文件
+unzip  备份文件  -d  释放目录     zip解压缩
+hostnamectl set-hostname 主机名  设置主机名(重进终端生效)
+LANG=语言  命令      指定语言输出命令结果,默认英语
 
+常见一级目录的用途
+/boot 存放系统引导必须的文件,包括内核,启动配置   /bin /sbin  存放各种命令程序
+/dev  存放设备文件     /etc  程序配置文件     /root /home  用户家目录
+/var  存放日志文件,邮箱目录等经常变化的文件     /proc  存放内存中的映射数据,不占用磁盘
+/tmp  存放系统运行中的一些临时文件            
 
 screen分屏工具
 screen                      进入可分屏模式
@@ -73,7 +86,7 @@ nfs文件共享
 服务端配置
 yum -y install nfs-utils
 vim /etc/export
-共享目录    *(ro)     定义共享目录,*为可访问网段,ro为只读,rw为读写  
+共享目录路径    *(ro)     定义共享目录,*为可访问网段,ro为只读,rw为读写  
 systemctl start nfs-server         启动服务
 systemctl enbale nfs-server        设置开机自启
 exportfs  -rv                      查看自身共享的目录
@@ -84,10 +97,69 @@ systemctl enbale nfs-server        设置开机自启
 showmount -e 服务端IP               查看服务端共享的目录
 vim /etc/fstab                     写入文件实现永久挂载
 服务端ip:共享目录  自身挂载点 nfs _netdev 0 0     写入挂载信息
+mount -a                           执行挂载文件
+安全nfs文件共享
+服务端
+wget -O  /etc/krb5.keytab 服务端秘钥   下载服务端秘钥
+vim /etc/export
+/protected   172.25.0.0/24(rw,sec=krb5p)        
+systemctl start nfs-secure-server nfs-server  重启两个服务
+客户端
+wget -O /etc/krb5.keytab 客户端秘钥     下载客户端秘钥
+systemctl start nfs-secure             启用安全NFS客户端服务
+showmount -e 服务端IP               查看服务端共享的目录
+vim /etc/fstab                     写入文件实现永久挂载
+服务端ip:共享目录  自身挂载点 nfs sec=krb5p,_netdev 0 0     写入挂载信息
+mount -a                           执行挂载文件
 
+parted分区工具
+进行gpt分区模式,128个主分区,最大支持18EB
+parted   设备              选择设备
+mktable  gpt/mbr          指定分区类型
+mkpart                    新建分区,起始点0,结束点2G
+print                     查看分区信息
+rm      分区号             删除分区
+unit    单位               改变显示单位
+quit                      退出
 
+部署postfix邮件服务器
+yum -y install postfix     安装软件
+vim /etc/postfix/main.cf   配置文件
+relayhost = [smtp0.example.com]         //后端邮件服务器
+116 inet_interfaces = all               //允许本机所有网卡服务
+99  myorigin = desktop0.example.com     //发件来源域
+mynetworks = 127.0.0.0/8, [::1]/128     //信任网络
+164 mydestination = server0.example.com   //判断是否为本域
+mail -s '标题' -r [发件人] 收件人               交互式发送邮件(不写发件人默认为当前用户)
+mail -s '标题' -r [发件人] 收件人  <  文本文件    非交互式发送邮件
+echo '文本' | mail -s '标题' -r [发件人] 收件人   非交互式发送邮件
+mail -u  用户               查看用户邮件,输入邮件编号查看
 
-
+iscsI网络共享磁盘
+服务器提供磁盘空间,客户机连接使用,端口3260
+lun外包装->block内包装->dev货物
+yum -y install targetcli      安装软件
+targetcli                     进入编辑模式
+/> backstores/block create iscsi_store  /dev/vdb1      //定义后端存储   名字  磁盘分区
+/> /iscsi create iqn.2016-02.com.example:server0       //创建 iqn 对象(要符合iqn规范)
+/> /iscsi/iqn.2016-02.com.example:server0/tpg1/acls create iqn.2016-02.com.example:desktop0   //授权客户机的IQN
+/> /iscsi/iqn.2016-02.com.example:server0/tpg1/luns create /backstores/block/iscsi_store      //绑定后端存储
+/> /iscsi/iqn.2016-02.com.example:server0/tpg1/portals create 172.25.0.11 3260      //指定监听地址(本机 IP 及端口)
+/> saveconfig     //保存配置结果(缺省)
+/> exit           退出
+systemctl restart target      重启服务
+systemctl enable target       设置开机自启
+客户端配置
+yum -y install iscsi-initiator-utils   安装软件
+vim /etc/iscsi/initiatorname.iscsi     设置本机iqn名称
+InitiatorName=iqn.2016-02.com.example:desktop0
+systemctl restart iscsid               重起 iscsid 服务以读取 iqn 名称
+man iscsiadm(在 examples 里面找)        寻找连接语法
+iscsiadm --mode discoverydb --type sendtargets --portal  172.25.0.11 --discover   发现磁盘(可简写为iscsiadm –m discovery –t st –p server0)
+vim /var/lib/iscsi/nodes/iqn.2016-02.com.example\:server0/*/default node.conn[0].startup = automatic  //把 manual 改成 automatic
+systemctl restart iscsid               重启服务
+systemctl enable iscsid                设置开机自启
+lsblk                                  查看多出的磁盘
 
 
 
