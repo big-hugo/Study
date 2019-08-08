@@ -35,7 +35,7 @@ UDP应用
 69TFTP简单文件传输协议  53DNS域名服务  123NTP网络时间协议
 
 linux配置ip地址
-vim /etc/sysconfig/network-scripts/ifcfg-网卡名      直接修改配置文件(硬核通用版本)
+方法1:vim /etc/sysconfig/network-scripts/ifcfg-网卡名      直接修改配置文件(硬核通用版本)
 DEVICE="eth0"               驱动名称,与ifconfig看到的名称一致
 ONBOOT="yes"                开机启动
 NM_CONTROLLED="no"          不接受NetworkManager控制
@@ -45,6 +45,9 @@ IPADDR="192.168.1.50"       IP地址
 NETMASK="255.255.255.0"     子网掩码
 GATEWAY="192.168.1.254"     默认网关
 systemctl restart network   重启网络服务
+方法2:nmcli connection modify '网卡名' ipv4.method manual ipv4.addresses 'IP/网段 网关' ipv4.dns dns connection.autoconnect yes    永久配置IP(redhat7.0以上支持)
+nmcli connection up '网卡名'       激活网卡
+方法3:nmtui                 图形界面配置IP
 
 华为eNSP软件
 <Huawei>system-view             //进入系统视图
