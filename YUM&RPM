@@ -1,4 +1,5 @@
-源码包安装
+源码包编译安装
+优点:获得最新版,及时修改bug;软件功能可定制;适用于各种平台
 yum -y install gcc 
 tar -xf  源码包
 cd  解压后目录   
@@ -39,10 +40,14 @@ rpm -qpi ~/rpmbulid/RPMS/x86_64/nginx-1.12.2-10.x86_64.rpm   安装软件
 
 
 yum软件
+/etc/yum.repos.d/*.repo    配置文件
+baseurl=file://仓库数据文件所在目录
 yum  -y install 软件包      安装软件
 yum groupinstall  软件包组  安装组包
 yum info 软件包            关于软件的描述信息
 yum provide  目录/文件      查看生成该目录的软件包
+createrepo   rpm包目录     生产仓库数据文件,在包目录下,文件名叫repodata
+
 
 rpm软件
 rpm -ivh 软件  安装软件
