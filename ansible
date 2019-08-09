@@ -1,0 +1,52 @@
+ansible
+是2013年推出的一款IT自动化和运维开发软件,2015被redhat收购,基于Python研发
+实现了批量操作系统配置,批量程序部署,批量运行命令等功能
+优点:只需ssh和Python即可使用;无客户端;功能强大;Python二次开发容易
+工作原理:主机集合对命令集合进行执行遍历(不并发),执行完后返回执行结果
+
+被托管主机环境需求:开启ssh服务;Python2.5或以上版本(redhat默认自带);如果开启了selinux需要安装libselinux-python
+托管机配置:
+vim /etc/hosts                 事先准备主机能解析被托管机
+yum -y install ansible         安装软件
+ansible --version              查看版本
+vim /etc/ansible/ansible.cfg    修改配置文件
+14 inventory = /etc/ansible/hosts   定义被管理主机名集群文件路径
+61 host_key_checking = False    ssh连接时不检查(不用输入yes)
+vim /etc/ansible/hosts        手写变量定义文件
+[web]                           自定义集合名
+web1                            主机名
+web2  ansible_ssh_port=7920     定义变量只对该主机生效
+[db]                             自定义集合
+db[1:2]                          表示db1 db2
+[xxoo:children]                  子组定义,该集合下面可调用组名
+web                              表示web集合
+db                               表示db集合
+[all:vars]                       定义变量集合,检测时调用此集合为默认配置
+ansible_ssh_port=ssh连接端口       定义默认变量                 
+ansible_ssh_pass=连接密码          定义默认变量
+ansible_ssh_private=私钥文件路径    更多变量参数到官网查看
+ansible_ssh_user=连接用户名
+ansible all/主机集合 --list[-hosts]             列出所有/集合被管理主机
+ssh-keygen -t ~/.ssh/rsa -b 2048 -N "" -f key  生产密钥对(这里私钥文件名用rsa是为了避免私钥文件名冲突)
+ssh-copy-id -i key.pub  目标主机    发送公钥给目标主机 
+ansible all -m ping               批量检测所有主机能否ssh(会生成缓存文件在~/.ansible/)
+
+ansible动态主机机制
+ansible all -m ping               批量检测所有主机能否ssh(会生成缓存文件在~/.ansible/)
+检测时会读取当前目录有没有配置文件,如果有,则优先读取当前目录的配置,如果没有,则读配置文件/etc/ansible/hosts
+vim /ooxx/ansible.cfg     在任意目录新建配置文件             
+[defaults]
+inventory = /ooxx/hosts   定义被管理主机名集群文件路径
+host_key_checking = False    ssh连接时不检查(不用输入yes)
+vim /ooxx/hosts           定义调用集群
+[web]                           自定义集合名
+web1                            主机名
+...
+这时,在当前目录执行检测时,调用的配置文件以当前目录优先
+
+ansible命令
+ansible all --list[-hosts]                 列出所有被管理主机
+ansible 主机集合 --list[-hosts]             列出集合主机
+ansible all/主机集合 -m ping -k             批量检测主机能否ssh(-k需要输入密码,一般部署ssh密钥对连接)
+
+
