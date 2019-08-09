@@ -12,9 +12,10 @@ lsattr [-l]  文件     查看文件属性
 
 selinux
 三大保护策略:安全上下文,布尔值,端口
+selinux运行模式:enforcing 强制模式   permissive 宽松模式  disabled 彻底禁用,需要重启机器
 vim /etc/sysconfig/selinux    主配置文件
 SELINUX=disabled              定义默认启用模式
-SELINUXTYPE=targeted          定义默认工作模式
+SELINUXTYPE=targeted          定义默认策略集
 getenforce           查看selinux是否开启
 sestatus             查看selinux状态
 setenforce   1/0     开启/关闭selinux(临时)
@@ -233,14 +234,21 @@ iptables -t nat -A POSTROUTING -s 192.168.2.0/24 -p tcp --dport 80 -j SNAT --to-
 公网地址是服务上动态分配时,定义防火墙规则
 iptables -t nat -A POSTROUTING -s 192.168.2.0/24 -p tcp --dport 80 -o eth0 -j MASQUERADE  
 
-
-
-
-
-
-
-
-
+firewall防火墙
+防火墙规则:查看请求的数据包中,客户端来源IP地址,查看自己所有区域规则,如果某一个区域有该源IP地址的规则,则进入该区域
+数据包结构:源IP地址-目标IP地址-目标端口号-数据
+防火墙区域:public  仅允许访问sshd dhcp ping
+         trusted 允许任何访问
+         block   拒绝访问
+         drop    丢弃来访数据包
+命令:firewall-config  &                           图形界面配置防火墙
+    firewall-cmd  --get-default-zone             查看默认区域
+    firewall-cmd  --set-default-zone=区域         设置默认区域
+    firewall-cmd  --zone=区域  --list-all         查看区域规则
+    firewall-cmd  --zone=区域  --add-service=协议  添加协议到区域里
+    firewall-cmd  --permant ...                   使配置永久生效 (需要重载)
+    firewall-cmd  --reload  ...                   重新加载防火墙配置
+    firewall-cmd --zone=区域 --add-forward-port=port=5423:proto=tcp:toport=80  端口重定向转发(把访问5423的数据转到80)
 
 
 
