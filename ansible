@@ -47,6 +47,30 @@ web1                            主机名
 ansible命令
 ansible all --list[-hosts]                 列出所有被管理主机
 ansible 主机集合 --list[-hosts]             列出集合主机
-ansible all/主机集合 -m ping -k             批量检测主机能否ssh(-k需要输入密码,一般部署ssh密钥对连接)
+ansible all/主机集合 -m ping [-k]           批量检测主机能否ssh(-k需要输入密码,一般部署ssh密钥对连接)
+ansible-doc -l                             列出所有模块(有1378行)
+ansible-doc 模块名                          查看帮助(按q退出)
+ansible all/主机集合 -m command -a '命令'    远程执行命令默认模块(命令不能启用shell,即> < | & 等不生效)
+ansible all/主机集合 -m shell -a '命令'      远程执行命令模块(支持shell,不能执行交互式命令,注意变量的二次解析)
+ansible all/主机集合 -m script -a '脚本'     远程执行脚本(复制脚本到远程机子上执行)
+ansible all/主机集合 -m yum -a 'name=包名 state=installed/removed'      远程yum装包/卸载
+ansible all/主机集合 -m service -a 'name=服务名 state=started/stopped...' 远程开启/关闭服务(enabled=yes开机自启动,sleep沉睡几秒)
+ansible all/主机集合 -m copy-a 'src=本地目录/文件 dest=目标目录/文件'                远程拷贝目录
+ansible all/主机集合 -m lineinfile -a 'path=目标文件 regexp="正则匹配" line="修改结果"'  远程修改文件某行
+ansible all/主机集合 -m replace -a 'path=目标文件 regexp="正则匹配" replace=修改结果'  远程修改文件的匹配内容
+ansible all/主机集合 -m setup                        显示可查询的信息
+ansible all/主机集合 -m setup -a 'filter=所需信息'     远程获取主机信息 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
