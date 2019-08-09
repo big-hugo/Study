@@ -27,12 +27,19 @@ zip -r 备份名称.zip  被归文档     zip压缩文件
 unzip  备份文件  -d  释放目录     zip解压缩
 hostnamectl set-hostname 主机名  设置主机名(重进终端生效)
 LANG=语言  命令      指定语言输出命令结果,默认英语
+date -s '2019-8-9 21:03:59'     修改系统时间
 
 常见一级目录的用途
 /boot 存放系统引导必须的文件,包括内核,启动配置   /bin /sbin  存放各种命令程序
 /dev  存放设备文件     /etc  程序配置文件     /root /home  用户家目录
 /var  存放日志文件,邮箱目录等经常变化的文件     /proc  存放内存中的映射数据,不占用磁盘
 /tmp  存放系统运行中的一些临时文件            
+
+alias别名
+alias                       查看当前别名
+vim  ~/.bashrc              可在该文件定义别名,当前用户生效
+vim  /etc/bashrc            定义全局别名,所有用户生效,刷新后可用
+source /etc/bashrc          刷新全局别名
 
 screen分屏工具
 screen                      进入可分屏模式
@@ -45,7 +52,8 @@ ctrl+a    d                 退出所有分屏
 进程管理
 树型结构,父进程与子进程,僵尸进程,孤儿进程
 pstree [选项] PID或进程名  查看进程数     -a 显示完整命令行  -p 列出对应PID 
-ps aux          查看所有进程信息
+ps aux          查看所有进程信息 
+ps -T -p pid号  查看进程产生的线程
 ps aux | wc -l  查看进程数量
 top [-d 刷新秒数] [-U 用户名]  进程动态排位
 pgrep  [-l 模糊进程名] [-U 指定用户进程] [-x 精确进程名]   检索进程
@@ -68,12 +76,21 @@ systemctl  isolate  graphical.target     切换图形模式
 systemctl  set-default  graphical.target    默认开机图形模式
 systemctl  get-default    查看默认开机模式
 
+find查找工具
+命令格式: find 目录 条件1 选项 条件2 选项 ... [-exec 命令 {} \;]        {}代表查询结果
+条件有: -type 文档类型        选项: l 快捷方式, d 目录, f 文件 
+       -name 文档名字             '被搜索的文件名'
+       -size 文档大小             +|-文件大小(k,M,G)
+       -user 用户名               创建该文档的用户名
+       -mtime 修改时间            +30 30天前 -20 20天内
+       
 ftp功能
 可用于共享文件
 yum -y install vsftp  安装软件包
 vim /etc/vsftp/vsftp.conf    修改主配置文件
 29 anon_upload_enable=YES    开启匿名用户上传功能
 systemctl restart vsftp      重启服务
+ls /var/ftp                  文件共享路径
 客户端连接
 yum -y install ftp   安装软件包
 ftp  目标IP          访问目标主机的FTP
