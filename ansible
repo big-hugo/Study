@@ -107,33 +107,111 @@ playbook剧本
 playbook是ansible用于配置,部署和管理主机的剧本,执行其中一系列tasks,可让远程主机达到预期状态
 playbook语法格式: 由YAML编写,遵循YAML标准;文件开始都是---;playbook由一个或多个play组成
 playbook构成: hosts: 定义要执行playbook的远程主机组
+             remote_user: 定义执行playbook的用户
               vars: 定义playbook运行时需要使用的变量
              tasks: 定义要在远程主机上执行的任务列表
              handlers: 定义task执行完成后需要调用的任务
+编写技巧: ansible-doc 模块名         查看模块帮助(按q退出)
+        /EXAMPLES                  过滤例子,查看模块执行方法,复制粘贴
+使用命令: ansible-playbook playbook.yaml  -f 5   执行playbook,-f并发进程数,默认为5,建议设置为CPU两倍
+         ansible
 例子:vim apache.yaml            编写playbook以yaml或yml结尾
     ---
-    - hosts: all
-      remote_user: root
+    - hosts: all                所有主机执行
+      remote_user: root         以root身份执行
       tasks:
-        - yum:
+        - yum:                  yum模块装包
             name: httpd
             state: latest
-        - service:
+        - service:              service模块启动
             name: httpd
             state: started
         - service:
             name: httpd
             enabled: yes
-        - lineinfile:
+        - lineinfile:           lineinfile模块修改
             path: /etc/httpd/conf/httpd.conf
             regexp: '^Listen 80'
             line: 'Listen 8080'
         - shell: echo "hello world" > /var/www/html/index.html
 ansible-playbook apache.yaml  -f 5      执行playbook,-f并发进程数,默认为5,建议设置为CPU两倍
+例子2:vim useradd.yaml            编写playbook添加用户并设定密码    
+---
+  - hosts: web
+    remote_user: root
+    vars:                         定义变量
+      username: dc
+      group: users
+    tasks:
+      - group:
+          name: "{{group}}"
+          state: present
+      - user:
+          name: "{{username}}"
+          group: "{{group}}"
+      - shell: echo "{{passwd}}"|passwd --stdin "{{username}}"
+vim passwd.yaml                    用Jinja2编写变量yaml文件,执行playbook时可以传入yaml文件 -e @passwd.yaml
+---
+passwd:
+  123
+ansible-playbook useradd.yaml -e '{passwd: 123}' -e ...  执行playbook,传入密码参数123
 
+playbook错误处理机制
+ansible-playbook对错误处理.默认判断$?,如果值不为0就停止执行,可通过ignore_errors忽略错误继续执行
+- shell: mkdir /var/html/www
+  ignore_errors:True           忽略错误继续执行,默认为False
 
+playbook便签
+tags:给指定的任务定义一个调用便签
+tasks:
+  - 模块1: 
+      ...
+    tags: 标签名          自定义标签名,与模块同级
+  - 模块2: 
+ansible-playbook xxx.yaml -t 标签名 -t ...   指定标签执行playbook对应模块
 
+playbook触发器
+handlers,当关注的资源发生变化时采取的操作
+用notify调用handler中的操作
+tasks: 
+  - 模块1: 
+      ...
+    notify:                定义触发检测,使用到该模块时就会执行handlers的事件
+      -  事件名称           调用handlers定义的事件名称
+handlers:                  与tasks同级
+  - name: 事件名称          定义事件名称
+    模块: ...               定义执行模块
 
+playbook条件判断触发
+---                        当cpu负载高于0.7时关闭服务
+  - hosts: web
+    remote_user: root
+    tasks:
+      - shell: uptime | awk '{printf("%.2f",$(NF-2))}'
+        register: result   返回前一个命令的对象,名为result
+      - service:
+          name: httpd
+          state: stopped
+        when: result.stdout|float > 0.7  调用result值与0.7比较
+
+playbook遍历
+with_items是playbook标准循环,通过{{item}}获取每次迭代的值
+例子: ---
+      - hosts: web2
+        remote_user: root
+        tasks: 
+          - group:
+              name: "{{group}}"
+              state: present
+          - user:
+              name: "{{name}}"
+              group: "{{group}}"
+          - shell: echo "{{passwd}}"|passwd --stdin "{{name}}"
+            with_items: 
+              - {name: 'nb',group: 'root',passwd: '123'}
+              - {name: 'plj',group: 'mysql',passwd: '567'}
+              ...
+playbook封装
 
 
 
