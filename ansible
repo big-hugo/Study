@@ -61,6 +61,77 @@ ansible all/主机集合 -m replace -a 'path=目标文件 regexp="正则匹配" 
 ansible all/主机集合 -m setup                        显示可查询的信息
 ansible all/主机集合 -m setup -a 'filter=所需信息'     远程获取主机信息 
 
+ansible七种武器
+第一: ansible命令,用于执行临时性工作
+第二: ansible-doc是ansible的模块文档说明
+第三: ansible-console是交互式工具,为习惯用shell交互式的用户提供良好的体验
+第四: ansible-galaxy是从github上下载管理Roles的工具,与Python的pip类似
+第五: ansible-playbook通过读取先编好的playbook文件实现批量管理,日常中使用频率最高
+第六: ansible-vault用于配置文件加密和解密,例如playbook加密
+第七: ansible-pull/push,默认使用push模式工作,适用于大批量机器配置,效率几乎可以无限提升
+
+JSON
+JSON时JavaScript对象表示法,它是一种基于文本独立于语言的轻量级数据交换格式,可通过JavaScript进行解析
+分隔符: 单引号' 括号() 中括号[] 大括号{} 冒号: 逗号, 
+语法规则: 数据在键值对中,数据由逗号分隔,大括号保存对象,中括号保存数组
+如: {"key":"value"}
+    {"key":["value1","value2"...]}
+    {["key1","key2"]:[{"key01":"value01"},{"key02":"value02"}...]}    对象和数组可以无限嵌套
+    
+YAML
+YAML是一个可读性高,用来表达数据序列的格式
+基础语法: 缩进结构通过空格来展示,数组用"- ",键值用": ",一般缩进级由两个以上空格组成,不能用tab代替空格,#注释
+例子1: "李白": "诗仙"
+例子2: "诗人": 
+         - "李白": "诗仙"
+           "年代": "唐"
+         - "杜甫": "诗圣"
+           "年代": "唐"
+         - ...
+Jinja2
+Jinja2时基于Python的模板引擎,包含变量和表达式两部分,playbook的模板使用Jinja2模块来处理
+基本语法: 表达式{{}}  控制语句{%%} 注释{##} 调用变量{{varname}} 计算{{2+3}} 判断{{1 in[1,2,3]}}
+例子: {% if name == ... %}
+      ...
+      {% elif name == '于谦' %}
+        {%for metho in [抽烟,喝酒,烫头]%}
+          {{do method}}
+        {% endfor %}
+        ...
+       {% endif %}
+ 变量可以通过过滤器修改,过滤器与变量用管道|分割,也可用圆括号传递可选参数,与shell的管道作用一样
+ 例子: {{'astr'|password_hash('sha512')}}
+ 可在http://docs.jinkan.org/docs/jinja2/templates.html查询过滤器
+ 
+playbook剧本
+playbook是ansible用于配置,部署和管理主机的剧本,执行其中一系列tasks,可让远程主机达到预期状态
+playbook语法格式: 由YAML编写,遵循YAML标准;文件开始都是---;playbook由一个或多个play组成
+playbook构成: hosts: 定义要执行playbook的远程主机组
+              vars: 定义playbook运行时需要使用的变量
+             tasks: 定义要在远程主机上执行的任务列表
+             handlers: 定义task执行完成后需要调用的任务
+例子:vim apache.yaml            编写playbook以yaml或yml结尾
+    ---
+    - hosts: all
+      remote_user: root
+      tasks:
+        - yum:
+            name: httpd
+            state: latest
+        - service:
+            name: httpd
+            state: started
+        - service:
+            name: httpd
+            enabled: yes
+        - lineinfile:
+            path: /etc/httpd/conf/httpd.conf
+            regexp: '^Listen 80'
+            line: 'Listen 8080'
+        - shell: echo "hello world" > /var/www/html/index.html
+ansible-playbook apache.yaml  -f 5      执行playbook,-f并发进程数,默认为5,建议设置为CPU两倍
+
+
 
 
 
