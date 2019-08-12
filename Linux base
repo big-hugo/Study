@@ -131,15 +131,6 @@ vim /etc/fstab                     写入文件实现永久挂载
 服务端ip:共享目录  自身挂载点 nfs sec=krb5p,_netdev 0 0     写入挂载信息
 mount -a                           执行挂载文件
 
-parted分区工具
-进行gpt分区模式,128个主分区,最大支持18EB
-parted   设备              选择设备
-mktable  gpt/mbr          指定分区类型
-mkpart                    新建分区,起始点0,结束点2G
-print                     查看分区信息
-rm      分区号             删除分区
-unit    单位               改变显示单位
-quit                      退出
 
 部署postfix邮件服务器
 yum -y install postfix     安装软件
@@ -180,14 +171,6 @@ systemctl restart iscsid               重启服务
 systemctl enable iscsid                设置开机自启
 lsblk                                  查看多出的磁盘
 
-swap交换空间
-当真实物理内存不够用时,会启用交换空间,将不常用的内存数据暂时放入交换空间中,缓解内存不足
-parted/fdisk   设备              划分分区
-mkswap  设备                     格式化文件系统swap(交换文件系统)
-swapon/swapoff 设备              启用/关闭交换空间
-swapon -s                       查看启用的交换空间成员
-vim    /etc/fstab               永久挂载(挂载类型swap)
-swapon -a                       重新加载/etc/fstab 
 
 
 
