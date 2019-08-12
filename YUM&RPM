@@ -1,3 +1,29 @@
+yum软件
+/etc/yum.repos.d/*.repo    配置文件
+[标识名]
+name=描述信息
+baseurl=下载路径          (file://或http://)
+enabled=1                 是否开启
+gpgcheck=0                是否进行gpg检测
+yum repolist              显示yum信息
+yum list                  列出yum仓库所有安装包
+yum list 软件包            列出已安装的包
+yum clean all             清除yum缓存
+yum  -y install 软件包     安装软件
+yum [-y] remove 软件包     卸载软件
+yum groupinstall  软件包组  安装组包
+yum info 软件包            关于软件的描述信息
+yum provide  目录/文件      查看生成该目录的软件包
+yum仓库具备条件: 1.众多软件包  2.仓库数据文件  3.构建web或ftp服务 
+createrepo   rpm包目录     生产仓库数据文件,在包目录下,文件名叫repodata
+
+rpm软件
+rpm -ivh 软件  安装软件
+rpm -e  包名   卸载软件
+rpm -ql 包名   查看软件包是否下载
+rpm -qc 软件   查看软件的配置文件位置
+rpm -qf  文件  查看生成该文件的软件
+
 源码包编译安装
 优点:获得最新版,及时修改bug;软件功能可定制;适用于各种平台
 yum -y install gcc 
@@ -39,19 +65,5 @@ rpmbuild  -ba ~/rpmbuild/SPECS/nginx.spec    生成rpm包
 rpm -qpi ~/rpmbulid/RPMS/x86_64/nginx-1.12.2-10.x86_64.rpm   安装软件
 
 
-yum软件
-/etc/yum.repos.d/*.repo    配置文件
-baseurl=file://仓库数据文件所在目录
-yum  -y install 软件包      安装软件
-yum groupinstall  软件包组  安装组包
-yum info 软件包            关于软件的描述信息
-yum provide  目录/文件      查看生成该目录的软件包
-createrepo   rpm包目录     生产仓库数据文件,在包目录下,文件名叫repodata
-
-
-rpm软件
-rpm -ivh 软件  安装软件
-rpm -qc 软件   查看软件的配置文件位置
-rpm -qf  文件  查看生成该文件的软件
 
 
