@@ -9,7 +9,8 @@ echo '密码' | passwd --stdin 用户名    非交互式修改密码
 passwd -S 用户名             查看密码状态
 passwd -l 用户名             锁定用户
 passwd -u 用户名             解锁用户
-用户默认配置
+
+用户密码默认配置
 vim /etc/login.defs         添加用户的默认配置文件
 PASS_MAX_DAYS   99999       密码最大有效期
 PASS_MIN_DAYS   0           密码最小有效期(多久改一次密码)
@@ -20,6 +21,7 @@ su  -  [用户名]       切换用户(切换系统环境)
 su  用户名            切换用户(不切换系统环境)
 su [-] -c  "命令"  [用户名]   以用户身份去执行命令   
 vim /var/log/secure  记录su操作的日志文件
+
 用户提权sudo
 设置系统普通用户可以执行root用户命令的权限
 sudo  命令            普通用户提权执行命令
