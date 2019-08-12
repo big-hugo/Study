@@ -16,8 +16,40 @@ systemctl enable elasticsearch.service              设置开机自启
 ss -auntlp | grep java                              查看是否有9200 9300端口
 http://主机IP:9200                                   查看主机ELK信息
 http://主机IP:9200/_cluster/health?pretty            查看主机ELK集群信息
+ES插件
+常用插件kopf,bigdesk,head
+/usr/share/elasticsearch/bin/plugin  list           查看已安装插件
+/usr/share/elasticsearch/bin/plugin install 插件路径    安装插件(一般用ftp://或http://下载)
+http://192.168.1.137:9200/_plugin/插件名             访问插件
+curl -XPUT '192.168.1.137:9200/tedu/' -d '{         命令行设置分片数量与副本数量  
+"settings":{
+        "index":{
+                "number_of_shards":5,
+                "number_of_replicas":1
+}}}'
+curl -XPUT 192.168.1.137:9200/tedu/teacher/行数 -d '{  命令行插入数据
+"姓名": "犇犇",
+"爱好": "王大锤",
+"阶段": "1"
+}'
+curl -XPOST 192.1681.137:9200/tedu/teacher/行数/_update -d '{  命令行修改数据值
+"doc":{"阶段": "2"}
+}'
+curl -XGET 192.168.1.137:9200/tedu/teacher/行数        命令行查询
+curl -XDELETE 192.168.1.137:9200/tedu/teacher/行        命令行删除
+curl -XPOST '192.168.1.137:9200/_bulk' --data-binary @logs.jsonl    导入数据文件
 
-
+http请求方法
+常用方法: GET,POST,HEAD
+其他方法: OPTIONS,PUT,DELETE,TRACE和CONNECT
+ES常用: PUT 增; DELETE 删; POST 改; GET 查
+curl常用参数
+-A 修改请求agent   -X 设置请求方法  -i 显示返回头信息
+curl elk主机ip:9200/_cat                             查看_cat所有用法
+curl elk主机ip:9200/_cat/health?v                    显示详细信息
+curl elk主机ip:9200/_cat/health?help                 显示帮助信息
+curl elk主机ip:9200/_cat/nodes?v                     查询节点状态信息
+curl elk主机ip:9200/_cat/indices?v                   索引信息
 
 
 
