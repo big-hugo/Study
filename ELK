@@ -71,10 +71,20 @@ firefox kibanaIP:5601                     访问页面
 
 Logstash
 负责日志的收集和分析、处理
+{数据源}==>input{}==>filter{}==>output==>{ES}
 vim /etc/hosts                            写入集群主机解析
 yum -y install java-1.8.0-openjdk logstash         安装软件
-touch /etc/logstash/logstash.conf         新建配置文件
+vim /etc/logstash/logstash.conf         新建配置文件
+input{
+        stdin{codec => "json"}
+}
+filter{}
+output{
+        stdout{codec => "rubydebug"}
+}
+/opt/logstash/bin/logstash -f /etc/logstash/logstash.conf  使用logstash配置文件
 /opt/logstash/bin/logstash  --version     查看版本
+/opt/logstash/bin/logstash-plugin list    查看插件
 
 
 
