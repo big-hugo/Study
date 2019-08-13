@@ -9,16 +9,31 @@ bin主程序目录  lib库文件 logs日志  temp临时  work自动编译 conf�
 mv /dev/random /dev/random.bak     备份
 ln -s  /dev/urandom  /dev/random    生成新的内存随机码
 
-tomcat配置文件 /usr/local/tomcat/conf/server.xml
-<Host name="域名"  appBase="网站目录名"  unpackWARS="true"自动解压  autoDeploy="ture"自动部署></Host>
-复制<Host>段修改内容可生成虚拟主机
+健全运行
+useradd tomcat            系统添加用户
+chown -R tomcat /usr/local/tomcat       授权
+su -  -c "/usr/local/tomcat/bin/startup.sh" tomcat        以tomcat用户运行启动命令
 
-网页跳转  把以test结尾的url跳转到其他路径下的网页
+创建虚拟主机
+tomcat配置文件 /usr/local/tomcat/conf/server.xml
+<Host name="域名"  appBase="网站相对路径目录名"  unpackWARS="true"自动解压  autoDeploy="ture"自动部署></Host>
+复制<Host>段修改内容可生成虚拟主机
+echo "AAA"   > /usr/local/tomcat/目录名/ROOT/index.html
+
+网页跳转  
+修改www.b.com网站的首页目录为base
+<Host...><Context path=""  docBase="base">
+echo "BASE" > /usr/local/tomcat/b/base/index.html
+把以test结尾的url跳转到其他路径下的网页
 <Host...><Context path="/test"  docBase="/var/www/html">
 
 tomcat部署ssl加密网站
 keytool -genkeypair -alias tomcat -keyalg RSA -keystore /usr/local/tomcat/keystore  生成私钥和证书
-配置文件<Connector port="8443"...  keystoreFile="/usr/local/tomcat/keystore" keystorePass="注册证书的密码" />
+vim /usr/local/tomcat/conf/server.xml
+<Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
+keystoreFile="/usr/local/tomcat/keystore" keystorePass="注册证书密码" clientAuth="false" sslProtocol="TLS" />
+重启服务
 
 配置tomcat日志
 日志存放在/usr/local/tomcat/log/下
@@ -33,10 +48,7 @@ curl -I http://192.168.4.50:8080         查看网页服务器版本
  bin/shutdown.sh        关闭服务
  bin/startup.sh         开启服务
 
-健全运行
-useradd tomcat            系统添加用户
-chown -R tomcat /usr/local/tomcat       授权
-su -  -c "/usr/local/tomcat/bin/startup.sh" tomcat        以tomcat用户运行启动命令
+
 
 
 
