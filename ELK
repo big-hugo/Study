@@ -51,6 +51,47 @@ curl elk主机ip:9200/_cat/health?help                 显示帮助信息
 curl elk主机ip:9200/_cat/nodes?v                     查询节点状态信息
 curl elk主机ip:9200/_cat/indices?v                   索引信息
 
+Kibana数据可视化平台工具
+负责日志的可视化
+yum -y install kibana                 安装软件
+/opt/kibana/config/kibana.yml
+vim /opt/kibana/config/kibana.yml     修改配置文件
+  2 server.port: 5601        若把端口改为80，可以成功启动kibana，但ss时没有端口，没有监听80端口，服务里面写死了，不能用80端口，只能是5601这个端口
+  5 server.host: "0.0.0.0"    服务器监听地址
+15 elasticsearch.url: http://192.168.1.51:9200    声明地址，从哪里查，集群里面随便选一个
+23 kibana.index: ".kibana"                        kibana自己创建的索引
+26 kibana.defaultAppId: "discover"    打开kibana页面时，默认打开的页面discover
+53 elasticsearch.pingTimeout: 1500    ping检测超时时间
+57 elasticsearch.requestTimeout: 30000    请求超时
+64 elasticsearch.startupTimeout: 5000     启动超时
+systemctl restart kibana                  启动服务              
+systemctl enable  kibana                  开机自启
+ss -antup | grep 5601                     查看监听端口
+firefox kibanaIP:5601                     访问页面
+
+Logstash
+负责日志的收集和分析、处理
+vim /etc/hosts                            写入集群主机解析
+yum -y install java-1.8.0-openjdk logstash         安装软件
+touch /etc/logstash/logstash.conf         新建配置文件
+/opt/logstash/bin/logstash  --version     查看版本
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
