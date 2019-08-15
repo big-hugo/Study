@@ -1,0 +1,14 @@
+Hadoop的部署模式
+单机  伪分布式  完全分布式
+安装hadoop
+yum -y install java-1.8.0-openjdk-devel             安装jdk依赖包
+jps                                                 查看jps
+tar -xf hadoop-2.7.7.tar.gz                         解压Hadoop包
+mv hadoop-2.7.7 /usr/local/hadoop                   移动解压后目录
+rpm -ql java-1.8.0-openjdk                          查看java安装路径
+/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-2.b14.el7.x86_64/jre
+cd /usr/local/hadoop                                进入Hadoop主目录
+vim ./etc/hadoop/hadoop-env.sh                      编辑启动脚本
+25 export JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-2.b14.el7.x86_64/jre"  写入jdk路径
+33 export HADOOP_CONF_DIR="/usr/local/hadoop/etc/hadoop"  写入配置文件路径
+/usr/local/hadoop/bin/hadoop                        现在可以启动脚本
