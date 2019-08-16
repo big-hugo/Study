@@ -1,12 +1,15 @@
 cal  1752     查看年历
 cat -n       加行号输出
 cp 源文件 目标路径         复制文件,-r复制目录,可以改名
+pwd          查看当前目录
 rm 文件       删除文件,-r删目录,-f不提示
 mv 源 目标    移动目录,可以改名
 cd [~用户名]  进入用户宿主目录 .表示当前目录 ..表示上一层目录
 man  命令     查看帮助手册
 命令 --help   查看帮助手册 
 file  文件    查看文件类型
+mount 文件或设备路径 挂载点      挂载文件或设备
+umount   挂载点                卸载文件或设备
 route -n      查看路由表
 route add/del default gw 192.168.2.51     添加/删除网关
 echo "/usr/local/nginx/sbin/nginx" >> /etc/rc.local   设定开机自启的命令
@@ -36,6 +39,12 @@ date -s '2019-8-9 21:03:59'     修改系统时间
 vim /etc/login.defs             用户密码加密配置,最后一行为密码加密方式
 uptime               查看cpu负载
 wget  下载路径   [-O 保存路径]     通过下载链接下载
+ctrl + l      清空屏幕(组合键)
+clear         清空屏幕(组合键)
+Esc+.或Alt+.   获取上一个最后参数
+ctrl+c        废弃当前编辑(组合键)
+ctrl+u        清空至行首(组合键)
+ctrl+w        回删一个参数(组合键)
 
 常见一级目录的用途
 /boot 存放系统引导必须的文件,包括内核,启动配置   /bin /sbin  存放各种命令程序
