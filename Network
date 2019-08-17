@@ -4,6 +4,8 @@
 MAC地址=物理地址（硬件地址）=网卡地址，全球唯一，不可更改.长度48位，前24位记录了厂商标识，后24位记录了序列号
 子网掩码: 电脑用于识别网段是否一样,与IP地址作与运算
 电脑没DHCP时,临时地址为169.254.0.0/16
+IPV6地址,128个二进制位数,冒号分隔十六进制数,段内连续多个0可简写为::,子网掩码都为/64
+一般IP地址末位为0是网段(网络id)  末尾255为广播地址 末尾1或254为网关
 IP地址分类: A:1~127      网主主主     255.0.0.0
            B:128~191    网网主主     255.255.0.0
            C:192~233    网网网主     255.255.255.0
@@ -58,8 +60,6 @@ systemctl restart network   重启网络服务
 方法2:nmcli connection modify '网卡名' ipv4.method manual ipv4.addresses 'IP/掩码 网关' ipv4.dns dns connection.autoconnect yes    永久配置IP(redhat7.0以上支持)
 nmcli connection up '网卡名'       激活网卡
 方法3:nmtui                 图形界面配置IP
-
-IPV6地址,128个二进制位数,冒号分隔十六进制数,段内连续多个0可简写为::,子网掩码都为/64
 
 linux链路聚合配置(又名:聚合链路 网卡绑定)
 提高网卡设备的可靠性,提高冗余
@@ -177,10 +177,40 @@ display  vrrp  brief            查看vrrp状态
 vrrp vrid 1  priority   200     调整优先级,越大越优先
  
 
+思科交换机路由器
+用户模式:默认
+特权模式:enable (exit返回上级)
+全局模式:configure terminal
+接口模式: interface fastEthernet 0/1
+         ip address 192.168.10.1 255.255.255.0   配置IP
+         no shutdown      激活配置
+reload                    重启机器
+wirte                     保存配置(没保存关机会丢失)
+tracert ip                路由跟踪
+telnet ip                 远程登录交换机
+show ip route             查看连接信息
+特权: show running -config     查看所有配置模式
+ctrl+shift+6              解锁卡死
 
+路由器配置静态路由
+全局: IP route 目标网段 子网掩码 下一跳地址
+路由器配置浮动路由
+全局: IP route 目标网段 子网掩码 下一跳地址 优先级(管理距离)
+路由器动态路由配置(30秒自动学习一次)
+configure terminal         进入全局模式
+router rip                 进入rip协议
+version 2                  选择版本,v1无法自动关闭总汇;v2可以关闭
+no auto-aumary             关闭路由自动总汇
+network   自身网段          宣告自身的网段
 
+交换机划分vlan
+switchport mode access     把端口改为access模式(允许一个vlan通过)
+switchport mode trunk      端口改为trunk模式(允许所有vlan通过)
+switchport access vlan *   把端口拉进vlan*
 
-
+交换机禁止vlan后恢复通信
+接口: no swithport trunk allowed vlan remove 10   禁用vlan10
+接口: switchport trunk allowed vlan add 10        启用vlan10
 
 
 
