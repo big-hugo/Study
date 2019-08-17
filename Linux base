@@ -18,6 +18,7 @@ nmtui         调用网络管理界面
 nslookup 域名  解析域名
 route -n      查看路由表,网关
 route add/del default gw 192.168.2.51     添加/删除网关
+systemctl start/stop/restart/enable/disable 服务名     管理服务
 echo "/usr/local/nginx/sbin/nginx" >> /etc/rc.local   设定开机自启的命令
 /usr/lib/systemd/system/此目录下可以设置systemctl管理的服务,可通过复制目录下的源文件修改命令路径使用 type=forking
 history -c    清除当前终端历史命令
