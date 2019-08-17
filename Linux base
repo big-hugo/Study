@@ -1,31 +1,31 @@
 cal  1752     查看年历
 cat -n       加行号输出
 cp 源文件 目标路径         复制文件,-r复制目录,可以改名
+mkdir 目录    创建目录(-p 递归创建)
+touch 文件    创建文件
 pwd          查看当前目录
 rm 文件       删除文件,-r删目录,-f不提示
 mv 源 目标    移动目录,可以改名
 cd [~用户名]  进入用户宿主目录 .表示当前目录 ..表示上一层目录
 man  命令     查看帮助手册
 命令 --help   查看帮助手册 
-file  文件    查看文件类型
+head -行数 文件                显示前n行,默认10行
+tail -行数 文件                显示后n行,默认10行
+less 文件     文件查看器,q退出
 mount 文件或设备路径 挂载点      挂载文件或设备
 umount   挂载点                卸载文件或设备
-route -n      查看路由表
+nmtui         调用网络管理界面
+nslookup 域名  解析域名
+route -n      查看路由表,网关
 route add/del default gw 192.168.2.51     添加/删除网关
 echo "/usr/local/nginx/sbin/nginx" >> /etc/rc.local   设定开机自启的命令
 /usr/lib/systemd/system/此目录下可以设置systemctl管理的服务,可通过复制目录下的源文件修改命令路径使用 type=forking
-which java    查看命令编译路径
-ps -C java    查看进程是否开启
 history -c    清除当前终端历史命令
 rm  -rf  ~/.bash_history      清除系统所有历史命令
 rm  -rf  ~/.mysql_history     清除数据库所有历史命令
 echo > /var/log/wtmp或btmp     清除用户登录信息
 su -  -c "命令" 用户            以其他用户执行命令
-sysctl -a     查看所有内核参数
 echo 1 > /proc/sys/net/ipv4/ip_forward  &&  sysctl -p  开机内核路由转发功能
-free -h       带单位显示内存
-arp -a        查看本机缓存记录的MAC地址(多用于交换机)
-lsmod         查看内核模块
 watch -n 1 '命令'              每1秒钟显示命令
 uuidgen       生成一个系统唯一的ID
 !.n           执行历史中第n条命令
@@ -34,23 +34,43 @@ ln -s  源文件  快捷方式文件       生成软连接(去-s为生成硬连�
 zip -r 备份名称.zip  被归文档     zip压缩文件
 unzip  备份文件  -d  释放目录     zip解压缩
 hostnamectl set-hostname 主机名  设置主机名(重进终端生效)
+hostname      查看主机名
 LANG=语言  命令      指定语言输出命令结果,默认英语
 date -s '2019-8-9 21:03:59'     修改系统时间
-vim /etc/login.defs             用户密码加密配置,最后一行为密码加密方式
-uptime               查看cpu负载
 wget  下载路径   [-O 保存路径]     通过下载链接下载
+
+性能查看
+uptime        查看cpu负载
+lsmod         查看内核模块
+sysctl -a     查看所有内核参数
+lscpu         查看cpu信息
+free -h       带单位显示内存
+cat /proc/meminfo             查看内存情况
+file  文件    查看文件类型
+which java    查看命令编译路径
+ps -C java    查看进程是否开启
+arp -a        查看本机缓存记录的MAC地址(多用于交换机)
+cat /etc/redhat-release       查看红帽发行信息
+
+快捷键
 ctrl + l      清空屏幕(组合键)
 clear         清空屏幕(组合键)
 Esc+.或Alt+.   获取上一个最后参数
 ctrl+c        废弃当前编辑(组合键)
 ctrl+u        清空至行首(组合键)
 ctrl+w        回删一个参数(组合键)
+ctrl+alt+fn   切换到tty1~tty6,tty1为图形
 
 常见一级目录的用途
 /boot 存放系统引导必须的文件,包括内核,启动配置   /bin /sbin  存放各种命令程序
 /dev  存放设备文件     /etc  程序配置文件     /root /home  用户家目录
 /var  存放日志文件,邮箱目录等经常变化的文件     /proc  存放内存中的映射数据,不占用磁盘
 /tmp  存放系统运行中的一些临时文件            
+
+ls查看工具
+使用格式: ls [选项] 文档
+-l 以长格式显示  -R 递归显示子目录  -A 显示以.开头的隐藏文件 
+-d 显示目录本身  -h 提供易读单位
 
 用户和组
 一个用户必须至少属于一个组,由系统创建与用户同名的组为同名组;由root创建的组为附加组
@@ -75,6 +95,7 @@ passwd [用户名]              交互式修改密码(只有root能接用户名)
 echo '密码' | passwd --stdin 用户名      非交互式修改密码(仅root能用)
 vim /etc/shadow             存放用户密码信息(加密!!为锁定状态)
 用户名:密码加密字符串:上次修改时间:
+vim /etc/login.defs          用户密码加密配置,最后一行为密码加密方式
 
 tar压缩/解压工具
 命令格式: tar 选项 压缩包名 源文档
@@ -86,6 +107,8 @@ tar压缩/解压工具
          tar -tf  压缩包                    查看包信息
 
 alias别名
+alias 别名='命令'            定义别名
+unalias 别名                 取消定义别名
 \命令                        临时取消命令别名
 alias                       查看当前别名
 vim  ~/.bashrc              可在该文件定义别名,当前用户生效,刷新后可用
@@ -219,10 +242,27 @@ systemctl restart iscsid               重启服务
 systemctl enable iscsid                设置开机自启
 lsblk                                  查看多出的磁盘
 
-
-
-
-
+vim-linux系统文件编辑器
+ESC或exit   退到命令模式
+末行模式    <---shift+:---           命令模式       ---a,i,o-->         插入模式         
+:set nu/nonu 开关行数显示             a 光标后插入 
+:wq 保存退出                         i 当前字符插入
+:w 保存                              o 下一行插入
+:q! 不保存退出                        5yy 复制5行
+:/字符 查找字符,n上,N下                P 粘贴
+:s/旧/新/g 替换字符,光标所在行          # 显示该字段
+:%s/旧/新/g 全文替换                  x/del 删除当前光标字符
+改/需要在/前加\                       u 撤回操作
+:X 加密,设空密码解密                   ctrl+r 反撤回操作
+:w 文件名  另存为                     dd 删除当前行
+:r 文件 读入其他文件                   5dd 删除5行
+:set ai/noai 开关缩进                d^ 删到行首
+                                    d$/D 删到行尾
+                                    C 删到行尾并插入
+                                    5gg/5G 跳到第5行
+                                    ctrl+v 多选
+                                    shift+i 输入 ESCx2 多行输入
+                                    shift+zz 保存退出
 
 
 
