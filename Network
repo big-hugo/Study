@@ -71,10 +71,11 @@ teamdctl 聚合网卡名 state     查看聚合网卡
 <Huawei>system-view             //进入系统视图
 [Huawei]interface Ethernet0/0/1    //进入接口视图
 [Huawei-Ethernet0/0/1]quit    //返回上一视图
-[Huawei]
 [Huawei]interface Ethernet0/0/1    //再次进入接口视图
 [Huawei-Ethernet0/0/1]return     //返回用户视图
 ctrl+]                退出系统
+ctrl+z                退出系统视图
+quit                  退到上层视图
 ］sysname  名字　　　　　配置主机名
 >save                 保存配置
 >reboot               重启主机
@@ -83,6 +84,8 @@ ctrl+]                退出系统
 >disp IP interface brief           查看本机所有ip
 ip routing-table | include /24     过滤包含/24的路由表
 undo terminal monitor               关闭提示信息
+tracert ip             路由跟踪
+一般undo开头为取消或删除
 配置设备用户名和密码
 ］aaa                        进入aaa认证，此视图支持用户创建
 -aaa] local-user 用户名 password cipher 密码       创建用户
@@ -102,8 +105,9 @@ console0]authentication-mode aaa                 激活配置
 ]undo vlan *                      删除vlan*
 0/0/1]port link-type access/trunk   把端口改为链路模式(仅允许一个vlan通过)或者中继链路模式(允许多个vlan通过)
 0/0/1]port default vlan *         把端口拉进vlan*
+0/0/1]undo port default vlan *    把端口退出vlan*
 ]port-group *                     新建组*
-]group-member e 0/0/1 to e 0/0/2    把端口拉进组
+]group-member e 0/0/1 to e 0/0/2  把端口拉进组
 ]display vlan                     查看vlan信息
 0/0/1]port trunk allow-pass vlan  all/*  允许trunk通过全部或单个vlan
 display this                      查看当前视图配置
@@ -111,12 +115,24 @@ clear configuration interface  e 0/0/1  清除端口配置(清除后要激活端
 ]interface Eth-Trunk *            新建链路聚合*
 trunkport Etherent   0/0/7  0/0/8  把端口拉进链路聚合*
 interface vlanif *                给vlan*建立虚拟接口,可配ip(用于三层交换机,可在虚拟接口中配置路由)
+交换机配置DHCP-自动获取ip地址
+dhcp enable                       开启dhcp服务
+vlan *                            新建vlan*
+interface vlanif *                进入虚拟vlan
+ip address 网段/掩码               配置虚拟端口
+dhcp select interface             把vlan*设置为dhcp
+dhcp server dns-list DNS地址       设置DNS
+dhcp server excluded-ip-address DNS地址   保护DNS地址
+0/0/1]port hybrid pvid vlan *     端口选择vlan*
+0/0/1]port hybrid untagged vlan *  端口不做tagged标签
+display arp                        查看分配的IP地址
 交换机STP生成树协议功能  
 逻辑上断开环路,防止广播风暴的生成,一般高级交换机自带,傻瓜机没有
 STP enable/disable   开启/关闭功能(默认开启)
 
 华为路由器配置命令
 让不同网段之间通讯
+静态路由配置
 0/0/1]ip address IP 子网掩码                 给端口配置ip
 ]ip route-static 目标网段  子网掩码  下一跳     静态路由配置
 ]display  ip routing-table                   查看路由表
@@ -124,7 +140,11 @@ STP enable/disable   开启/关闭功能(默认开启)
 动态路由OSPF协议
 ]ospf *
 ospf-*]area *
-ospf-area]network  IP  0.0.0.255            对外宣告自身网段(反子网掩码)
+ospf-area]network  网段  0.0.0.255            对外宣告自身网段(反子网掩码)
+动态路由RIP协议
+rip *
+version 2
+network 网段                                 宣告自身网段
 基本ACL访问配置
 限制来源IP访问,根据rule号越小匹配即停止
 ]acl *                        新建acl域(2000~2999)
