@@ -46,6 +46,26 @@ for i in node{1..3} nn01;do
 done
 
 
+Kafka集群
+[root@node1 hadoop]# tar -xf kafka_2.12-2.1.0.tgz
+[root@node1 ~]# mv kafka_2.12-2.1.0 /usr/local/kafka
+root@node1 ~]# cd /usr/local/kafka/config
+[root@node1 config]# vim server.properties
+broker.id=22
+zookeeper.connect=node1:2181,node2:2181,node3:2181
+拷贝 kafka 到其他主机，并修改 broker.id ,不能重复
+[root@node1 config]# for i in 63 64; do rsync -aSH --delete /usr/local/kafka 192.168.1.$i:/usr/local/; done
+[root@node2 ~]# vim /usr/local/kafka/config/server.properties   
+broker.id=23
+[root@node1 local]# /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties 
+[root@node1 local]# jps        //出现kafka
+验证配置，创建一个 topic
+[root@node1 local]# /usr/local/kafka/bin/kafka-topics.sh --create --partitions 1 --replication-factor 1 --zookeeper node3:2181 --topic aa    
+[root@node2 ~]# /usr/local/kafka/bin/kafka-console-producer.sh --broker-list node2:9092 --topic aa        //写一个数据,模拟生产者，发布消息
+[root@node3 ~]# /usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server node1:9092 --topic aa        //这边会直接同步,模拟消费者，接收消息
+注意：kafka比较吃内存，做完这个kafka的实验可以把它停了
+
+
 
 
 
