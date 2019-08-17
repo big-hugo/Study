@@ -209,7 +209,72 @@ nfsgwIP地址:/  /mnt/ nfs  vers=3,proto=tcp,nolock,noatime,sync,noacl,_netdev 0
 
 
 
+Zookeeper
+是一个开源的分布式应用程序协调服务,用来保证数据在集群间的事务一致性
+角色与特性: Leader: 复制所有Follower进行内部数据交换
+          Follower: 为客户端服务并参与提案投票,同时与Leader进行数据交换
+          Observer:  为客户端服务但不参与提案投票,同时与Leader进行数据交换
+角色与选举: 假如集群中拥有n台服务器,那么Leader必须得到n/2+1台服务器投票,剩下的是Follower
+          Observer不计算在投票总设备数量里面,剩余机器不足n/2+1时,集群停止工作
 
+Zookeeper安装
+vim /etc/hosts                                      域名解析所有集群主机
+tar -xf zookeeper-3.4.13.tar.gz                     解包
+mv zookeeper-3.4.13 /usr/local/zookeeper            移动目录
+cd /usr/local/zookeeper/conf/                       进入目录操作
+mv zoo_sample.cfg  zoo.cfg                          重任命文件
+chown root.root zoo.cfg                             授权
+vim zoo.cfg                                         在文件后添加以下4行
+server.1=node1:2888:3888                            node1.2.3为主机名
+server.2=node2:2888:3888
+server.3=node3:2888:3888
+server.4=nn01:2888:3888:observer                     nn01为主机名
+for i in node{1..3}; do scp -r /usr/local/zookeeper/ root@$i:/usr/local/zookeeper/; done   同步到其他节点
+mkdir /tmp/zookeeper                                创建目录,每台主机都要
+echo 4 >/tmp/zookeeper/myid                         创建 myid 文件，id 必须与配置文件里主机名对应的 server.(id) 一致
+/usr/local/zookeeper/bin/zkServer.sh start          启动服务
+/usr/local/zookeeper/bin/zkServer.sh status         查看集群状态
+/usr/local/zookeeper/bin/zkServer.sh stop           关闭服务
+yum -y install telnet                               安装控制软件
+telnet node3 2181 
+Trying 192.168.1.24...
+Connected to node3.
+Escape character is '^]'.
+ruok                                          //发送
+imokConnection closed by foreign host.        //imok回应的结果
+ vim api.sh                                         查看api状态脚本
+#!/bin/bash
+function getstatus(){
+    exec 9<>/dev/tcp/$1/2181 2>/dev/null
+    echo stat >&9
+    MODE=$(cat <&9 |grep -Po "(?<=Mode:).*")
+    exec 9<&-
+    echo ${MODE:-NULL}
+}
+for i in node{1..3} nn01;do
+    echo -ne "${i}\t"
+    getstatus ${i}
+done
+
+
+Kafka集群
+[root@node1 hadoop]# tar -xf kafka_2.12-2.1.0.tgz
+[root@node1 ~]# mv kafka_2.12-2.1.0 /usr/local/kafka
+root@node1 ~]# cd /usr/local/kafka/config
+[root@node1 config]# vim server.properties
+broker.id=22
+zookeeper.connect=node1:2181,node2:2181,node3:2181
+拷贝 kafka 到其他主机，并修改 broker.id ,不能重复
+[root@node1 config]# for i in 63 64; do rsync -aSH --delete /usr/local/kafka 192.168.1.$i:/usr/local/; done
+[root@node2 ~]# vim /usr/local/kafka/config/server.properties   
+broker.id=23
+[root@node1 local]# /usr/local/kafka/bin/kafka-server-start.sh -daemon /usr/local/kafka/config/server.properties 
+[root@node1 local]# jps        //出现kafka
+验证配置，创建一个 topic
+[root@node1 local]# /usr/local/kafka/bin/kafka-topics.sh --create --partitions 1 --replication-factor 1 --zookeeper node3:2181 --topic aa    
+[root@node2 ~]# /usr/local/kafka/bin/kafka-console-producer.sh --broker-list node2:9092 --topic aa        //写一个数据,模拟生产者，发布消息
+[root@node3 ~]# /usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server node1:9092 --topic aa        //这边会直接同步,模拟消费者，接收消息
+注意：kafka比较吃内存，做完这个kafka的实验可以把它停了
 
 
 
