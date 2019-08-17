@@ -5,6 +5,7 @@ name=描述信息
 baseurl=下载路径          (file://或http://)
 enabled=1                 是否开启
 gpgcheck=0                是否进行gpg检测
+yum-config-manager --add file:yum源      自动生产前四行配置
 yum repolist              显示yum信息
 yum list                  列出yum仓库所有安装包
 yum list 软件包            列出已安装的包
