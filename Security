@@ -9,12 +9,22 @@ chown  所有者:所属组   文档    修改文档归属
 特殊权限: g+S   新增的子文档自动继承父目录属组
          u+s   多用于执行文件,让使用者用于属主身份
          o+t   适用于开发w权限的目录,禁止操作别人的文档
+
+Linux密码破解
+1. 启动系统GRUB界面按e进入编辑界面
+2. 在linux16行尾添加 rd.break console=tty0      
+3. ctrl+x  输入mount -o remount,rw /sysroot/    回车,读写方式重挂载根系统
+4. chroot /sysroot/   回车,切换到根目录  
+5. passwd 用户名 或 echo 密码 | passwd --stdin 用户名    修改密码
+6. touch /.autorelabel     标记一次启动重做selinux标签
+7. exit
+8. reboot
+ 
 ACL策略
 setfacl [-R] -m u:用户名:权限 文档     为单独个人分配权限,权限表后有+号(-R 递归分配权限)
 getfacl 文档                 获取文件acl信息
 setfacl [-R] -b 文档         清除文档所有acl权限分配(-R 递归)
 setfacl -x u:用户名 文档      清除一个acl权限 
-
 
 伪装登录(用于隐藏系统和内核版本)
 vim /etc/issue              本地登录提示文件
