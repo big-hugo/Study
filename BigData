@@ -258,6 +258,7 @@ done
 
 
 Kafka集群
+是一个分布式的消息系统,消息中间件
 [root@node1 hadoop]# tar -xf kafka_2.12-2.1.0.tgz
 [root@node1 ~]# mv kafka_2.12-2.1.0 /usr/local/kafka
 root@node1 ~]# cd /usr/local/kafka/config
