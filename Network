@@ -177,6 +177,7 @@ display  vrrp  brief            查看vrrp状态
 vrrp vrid 1  priority   200     调整优先级,越大越优先
  
 
+
 思科交换机路由器
 用户模式:默认
 特权模式:enable (exit返回上级)
@@ -204,15 +205,21 @@ no auto-aumary             关闭路由自动总汇
 network   自身网段          宣告自身的网段
 
 交换机划分vlan
+vlan *                     新建vlan *
 switchport mode access     把端口改为access模式(允许一个vlan通过)
 switchport mode trunk      端口改为trunk模式(允许所有vlan通过)
 switchport access vlan *   把端口拉进vlan*
+show vlan brief            查看vlan信息(特权模式下)
 
 交换机禁止vlan后恢复通信
 接口: no swithport trunk allowed vlan remove 10   禁用vlan10
 接口: switchport trunk allowed vlan add 10        启用vlan10
 
-
+三层交换机配置路由转发
+interface fastethernet 0/1       进入端口
+no switchport                    关闭交换机接口
+ip address IP 掩码                配置端口IP
+ip routing                       开启路由功能
 
 
 
