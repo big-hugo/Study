@@ -33,6 +33,8 @@ set password for 用户名@'登录地址' = password('密码'); 为用户修改�
 mysql -u用户 -p密码 -e 'sql命令'   在shell操作数据库
 \c                             取消当前输入命令换行
 show engines;            查看数据库存储引擎
+show processlist;        查看数据库进程
+kill id;                 杀死进程
 
 
 root密码恢复
