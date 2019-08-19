@@ -6,16 +6,40 @@ Docker是完整的一套容器管理系统
 Docker容器的隔离性没有虚拟化强,共用linux内核,安全性先天缺陷
 Docker中容器时基于镜像启动的,镜像时启动容器的核心,采用分层设计,用COW技术确保底层数据不丢失
 
+自定义私有镜像仓库
+yum -y install docker-distribution              安装软件
+systemctl start docker-distribution.service     启动服务
+systemctl enable docker-distribution.service    设置开机自启
+/etc/docker-distribution/registry/config.yml     仓库配置文件
+/var/lib/registry                               数据存储路径
+curl 自身IP:5000/v2                     访问自身5000端口的v2文件(正确则输出:<a href="/v2/">Moved Permanently</a>.)
+vim /etc/sysconfig/docker                       修改配置文件
+13 ADD_REGISTRY='--add-registry 自身IP:5000'     指定自身IP:端口
+24 INSECURE_REGISTRY='--insecure-registry 自身IP:5000'         自身IP:端口
+systemctl restart docker                        重启docker服务
+docker tag 镜像名称:标签  自身IP:5000/镜像名:新标签  新建修改名称标签后的镜像
+docker push 自身IP:5000/镜像名:新标签              上传改名后镜像到自身私有仓库
+curl IP:5000/v2/_catalog                        查看私有镜像仓库中的镜像名称
+curl IP:5000/v2/镜像名/tags/list               查看某镜像的标签
+客户端连接私有仓库
+vim /etc/sysconfig/docker                       修改配置文件
+13 ADD_REGISTRY='--add-registry 仓库IP:5000'    指定私有仓库的IP:端口
+24 INSECURE_REGISTRY='--insecure-registry 仓库IP:5000'      指定私有仓库的IP:端口
+systemctl restart docker                        重启docker服务
+curl IP:5000/v2/_catalog                        查看私有镜像仓库中的镜像名称
+curl IP:5000/v2/镜像名/tags/list                 查看某镜像的标签
+docker run -it 仓库IP:5000/镜像名:标签            运行私有仓库上的镜像
+
+客户端docker操作
 安装软件
 yum -y install docker             安装docker软件
 systemctl restart docker          启动docker软件
 systemctl enable docker           设置开机自启动
-
 Dockerhub镜像仓库
 docker images                     查看本机docker镜像  (名称 标签 ID 创建时间 大小)
 docker search   软件名             查看docker官网提供的镜像仓库
-docker pull     下载路径           下载ocker官网提供的镜像
-docker push     上传路径           上传镜像到docker官网
+docker pull     下载路径           下载镜像(如果没有连接私有仓库,默认从官网下载)
+docker push     上传路径           上传镜像(如果没有连接私有仓库,默认从官网上传)
 docker save 镜像名称:标签 -o 文件名.tar        导出(备份)镜像 ,生成的文件类型为tar包
 docker load -i  文件名                       导入(还原)镜像,用导出tar包 
 docker run -it  镜像名称:标签 /bin/bash       启动镜像生成一个容器(/bin/bash指容器里的路径,不添加则执行镜像里的默认命令,-itd后台运行)
@@ -60,29 +84,7 @@ Dockerfile语法格式：
 – WORKDIR:定义容器默认工作目录
 – CMD:容器启动时执行的命令,仅可以有一条CMD
 
-自定义私有镜像仓库
-yum -y install docker-distribution              安装软件
-systemctl start docker-distribution.service     启动服务
-systemctl enable docker-distribution.service    设置开机自启
-/etc/docker-distribution/registry/config.yml     仓库配置文件
-/var/lib/registry                               数据存储路径
-curl 自身IP:5000/v2                     访问自身5000端口的v2文件(正确则输出:<a href="/v2/">Moved Permanently</a>.)
-vim /etc/sysconfig/docker                       修改配置文件
-13 ADD_REGISTRY='--add-registry 自身IP:5000'     指定自身IP:端口
-24 INSECURE_REGISTRY='--insecure-registry 自身IP:5000'         自身IP:端口
-systemctl restart docker                        重启docker服务
-docker tag 镜像名称:标签  自身IP:5000/镜像名:新标签  新建修改名称标签后的镜像
-docker push 自身IP:5000/镜像名:新标签              上传改名后镜像到自身私有仓库
-curl IP:5000/v2/_catalog                        查看私有镜像仓库中的镜像名称
-curl IP:5000/v2/镜像名/tags/list               查看某镜像的标签
-客户端连接私有仓库
-vim /etc/sysconfig/docker                       修改配置文件
-13 ADD_REGISTRY='--add-registry 仓库IP:5000'    指定私有仓库的IP:端口
-24 INSECURE_REGISTRY='--insecure-registry 仓库IP:5000'      指定私有仓库的IP:端口
-systemctl restart docker                        重启docker服务
-curl IP:5000/v2/_catalog                        查看私有镜像仓库中的镜像名称
-curl IP:5000/v2/镜像名/tags/list                 查看某镜像的标签
-docker run -it 仓库IP:5000/镜像名:标签            运行私有仓库上的镜像
+
 
 docker存储卷
 docker容器不保持任何数据,重要数据用概不卷存储,容器可以挂载真机的目录或共享文件
