@@ -50,8 +50,10 @@ URL:    www.test.com                                    #网址
 Source0:nginx-1.12.2.tar.gz                        #源码包文件的全称(不能乱写)
 #BuildRequires:                                    #制作RPM时的依赖关系
 #Requires:                                        #安装RPM时的依赖关系
-%description   XXXXXXXXXXXXXXXXXXX            #软件的详细描述
-%post      useradd nginx                     #非必需操作：安装后脚本(创建账户),多命令可回车输入
+%description                                 #软件的详细描述
+XXXXXXXXXXXXXXXXXXX            
+%post                                           #非必需操作：安装后脚本(创建账户),多命令可回车输入
+useradd nginx                    
 %prep
 %setup -q                                #自动解压源码包，并cd进入目录
 %build
