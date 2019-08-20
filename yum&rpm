@@ -16,7 +16,8 @@ yum groupinstall  软件包组  安装组包
 yum info 软件包            关于软件的描述信息
 yum provide  目录/文件      查看生成该目录的软件包
 yum仓库具备条件: 1.众多软件包  2.仓库数据文件  3.构建web或ftp服务 
-createrepo   rpm包目录     生产仓库数据文件,在包目录下,文件名叫repodata
+createrepo   rpm包目录     生成仓库数据文件,在包目录下,文件名叫repodata
+createrepo  [--update] rpm包目录     更新仓库数据文件
 
 rpm软件
 rpm -ivh 软件  安装软件
