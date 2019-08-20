@@ -2,6 +2,7 @@ Nginx安装
 用源码包安装 依赖包有gcc  pcre-devel  openssl-devel
 useradd -s /sbin/nologin nginx   系统新建一个非登录用户
 ./configure  --user=nginx  --group=nginx --with-http_ssl_module --with-http_stub_status_module 源码包检测时可添加nginx用户,默认用户为nobody,为了安全;可用--help查看可安装的模块
+报什么错就装什么依赖包
 /usr/local/nginx/sbin/nginx  启动程序
 /usr/local/nginx/sbin/nginx  -s stop   停止服务
 /usr/local/nginx/sbin/nginx  -s reload  重载配置
