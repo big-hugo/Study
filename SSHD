@@ -22,3 +22,11 @@ ssh-copy-id  用户名@服务器ip        发送公钥到服务器,实现免密�
 ssh+cp命令
 ssh -P 端口  本地目录  用户@目标ip    远程传输文件,-r传输目录
 echo > /var/log/wtmp或btmp        清除用户登录信息
+
+连接时不提问
+vim /etc/ssh/ssh_config
+27    GSSAPIAuthentication yes
+35    StrictHostKeyChecking no
+
+秘钥对连接失败
+rm -rf ~/.ssh/know_hosts
