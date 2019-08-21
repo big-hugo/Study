@@ -105,6 +105,22 @@ server {    ...
                            proxy_pass  http:// name:        转发给集群 
            }
 }
+例子:调度tomcat集群
+vim  /usr/local/nginx/conf/nginx.conf
+http{
+    upstream toms {
+        server 192.168.2.100:8080;
+        server 192.168.2.200:8080;
+    }
+    server  {
+        listen 80;
+        server_name localhost;
+        location / {
+            proxy_pass  http://toms;
+        }
+    }
+}  
+
 
 
 Nginx四层(TCP/UDP)调度器
