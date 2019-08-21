@@ -91,6 +91,13 @@ server{  ...                                           写在虚拟主机里
         }  
 }
 
+实现动静分离
+vim  /usr/lcoal/nginx/conf/nginx.conf      修改配置文件
+server{... 
+      localtion ~* \.(jpg|gif|png|xml)${   匹配URL结尾 
+       proxy_pass http://127.0.0.1:8080;         }     转发到本机的8080端口
+}
+
 
 Nginx七层调度器(反向代理)
 功能:轮询调度,健康检查
