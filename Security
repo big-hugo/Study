@@ -10,6 +10,24 @@ chown  所有者:所属组   文档    修改文档归属
          u+s   多用于执行文件,让使用者用于属主身份
          o+t   适用于开发w权限的目录,禁止操作别人的文档
 
+LDAP认证
+账号统一认证,在LDAP服务器上的用户可在其他服务器登录.用户家目录需要挂载到本地
+yum -y install sssd
+authconfig-tui
+[*]Use LDAP  [*]使用LDAP认证 next
+[*]Use TLS   server:classroom.example.com
+Base DN:dc=example,dc=com
+/etc/openldap/cacerts      证书加密下载地址
+systemctl restart(enable) sssd      重启sssd服务(开机自启)
+autofs自动挂载LDAP家目录
+yum -y install autofs
+mkdir /home/guests
+vim /etc/auto.master       指定监控点(家目录的父目录
+/home/guests  /etc/guests.rule
+vim /etc/guests.rule       配置挂载策略
+用户名 -rw 来源家目录 (用户名为*表示任何用户)
+systemctl restart(enable) autofs
+
 Linux密码破解
 1. 启动系统GRUB界面按e进入编辑界面
 2. 在linux16行尾添加 rd.break console=tty0      
