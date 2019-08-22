@@ -208,6 +208,28 @@ vim /etc/fstab                     写入文件实现永久挂载
 服务端ip:共享目录  自身挂载点 nfs sec=krb5p,_netdev 0 0     写入挂载信息
 mount -a                           执行挂载文件
 
+Samba文件共享
+服务端
+yum -y install samba               安装软件
+mkdir /common                      新建共享目录
+setsebool -P samba_export_all_rw=on    关闭布尔值限制(没开selinux可以省略)
+useradd harry                     新建用户
+pdbedit -a harry                  启用共享账号,设置密码
+vim /etc/samba/smb.conf           修改配置文件
+[global]                         
+workgroup = STAFF                 指定工作组
+[common]
+path = /common                    指定共享目录
+hosts allow = 172.25.0.0/24       指定允许访问网段
+systemctl restart smb
+systemctl enable smb
+客户端
+yum -y install samba-client cifs-utils  安装软件
+smbclient -L server0              查看对方共享
+vim /etc/fstab                    永久挂载
+server0.example.com/devops   挂载点   cifs   _netdev 0 0
+mount -a   //检查挂载配置
+
 部署postfix邮件服务器
 yum -y install postfix     安装软件
 vim /etc/postfix/main.cf   配置文件
@@ -247,7 +269,8 @@ systemctl restart iscsid               重启服务
 systemctl enable iscsid                设置开机自启
 lsblk                                  查看多出的磁盘
 
-vim-linux系统文件编辑器
+vim
+linux系统文件编辑器
 ESC或exit   退到命令模式
 末行模式    <---shift+:---           命令模式       ---a,i,o-->         插入模式         
 :set nu/nonu 开关行数显示             a 光标后插入 
