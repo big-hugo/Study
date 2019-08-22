@@ -24,6 +24,7 @@ done
 ceph-deploy mon create-initial       初始化所有节点的mon服务，也就是启动mon服务（主机名解析必须对）
 常见错误:[ERROR ] admin_socket: exception getting command descriptions: [Error 2] No such file or directory
 解决方法:先确定是否在ceph-cluster目录下,如果是,执行 echo 'public_network = 192.168.4.0/24' >> ceph.conf 
+        修改后重新推送配置文件:ceph-deploy --overwrite-conf config push node1 node2 node3
 ceph -s           查看状态(HEALTH_ERR为错误)
 创建OSD
      for i in node1 node2 node3                vdb1和vdb2这两个分区用来做存储服务器的journal缓存盘
