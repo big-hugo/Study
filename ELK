@@ -2,6 +2,7 @@ ELK
 分别代表: Elasticsearch负责日志检索和储存  Logstash负责日志的收集和分析、处理  Kibana负责日志的可视化
 类似于LNMP是一个服务平台,三款软件都是开源,通常配合使用,都属于Elastic.co公司名下,故称ELK
 ELK作用: 分布式日志数据集中式查询和管理;系统监控,包括硬件和应用各个组件的监控;故障排查;安全信息和事件管理;报表功能
+傻瓜式搭建ELK https://blog.csdn.net/qq_39043100/article/details/100020839
 
 Elasticsearch部署
 yum -y install java-1.8.0-openjdk elasticsearch     安装软件(需要1.7以上的jdk)
