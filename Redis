@@ -110,7 +110,7 @@ echo $redis->get('变量名');      输出获取的值
 ?>
 curl  127.0.0.1/test.php       访问测试能不能获取值
 
-redis集群的高可用功能
+redis集群的高可用(最少6台)
 把主服务器的redis服务停止,对应的从服务器会自动升级成主服务器。
 宕机的主服务器redis服务运行后,自动作当前主库的从库并自动同步宕机期间产生的新数据。
 配置redis集群
@@ -128,7 +128,7 @@ vim  +43  /etc/init.d/redis_6379              修改启动脚本
 $CLIEXEC -h 本机IP  -p 自定义端口  shutdown
 /etc/init.d/redis_6379    start               重启服务
 部署ruby脚本运行环境(在其中一台机上做)
-yum -y install ruby             安装ruby
+yum -y install ruby  rubygems   安装ruby,rubygems
 rpm -qf /usr/bin/gem            检查gem
 gem install  redis-3.2.1.gem    安装gem包
 mkdir /root/bin                 创建命令检索目录
