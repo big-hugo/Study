@@ -232,6 +232,7 @@ masterha_manager --conf=/etc/mha/app1.cnf --remove_dead_master_conf --ignore_las
 
 PXC高可用数据库集群
 无同步延迟,没有主从切换操作,无需VIP,支持innodb引擎,多线程复制,节点自动加入,节点修复后自动同步数据
+可通过脚本监控各个节点,切换前端的连接IP
 涉及软件:percona-xtrabackup在线热备程序   qpress递归压缩程序   Percona-XtraDB-Cluster-server集群服务程序
 3306数据库服务端口  4444 SST全量同步端口  4567集群通信端口   4568IST增量同步端口
 PXC环境搭建
