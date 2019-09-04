@@ -45,6 +45,7 @@ ifconfig      查看网络信息
 uptime        查看cpu负载
 lsmod         查看内核模块
 sysctl -a     查看所有内核参数
+uname -rv     查看内核版本
 lscpu         查看cpu信息
 free -h       带单位显示内存
 cat /proc/meminfo             查看内存情况
