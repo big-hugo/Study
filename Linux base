@@ -16,6 +16,7 @@ mount 文件或设备路径 挂载点      挂载文件或设备
 umount   挂载点                卸载文件或设备
 nmtui         调用网络管理界面
 nslookup 域名  解析域名
+traceroute  目标ip     路由跟踪
 route -n      查看路由表,网关
 route add/del default gw 192.168.2.51     添加/删除网关
 systemctl start/stop/restart/enable/disable 服务名     管理服务
