@@ -1,0 +1,43 @@
+下载最新版python3
+首先去python官网下载python3的源码包，网址：https://www.python.org/
+进去之后点击导航栏的Downloads，也可以鼠标放到Downloads上弹出菜单选择Source code，表示源码包，这里选择最新版本3.6.4，
+这里选择第一个下载即可，下载的就是源码包：Python-3.6.4.tar.gz，下载好之后上传到linux系统，准备安装
+
+
+Linux下安装python3
+yum install -y gcc gcc-c++ zlib-devel openssl-devel readline-devel libffi-devel sqlite-devel tcl-devel tk-devel
+tar -xzf Python-3.6.4.tar.gz      解包
+cd Python-3.6.4 && ls             进入目录查看，此时Python-3.6.4文件夹中没有makefile文件
+./configure --prefix=/usr/local   configure是用来进行用户个性配置的工具，--prefix是说软件安装目录设置在哪里， =/usr/local就是你给出的安装目录
+ls                                此时Python-3.6.4文件夹中生成了makefile文件
+make && make install              编译和安装，整个过程大约5-10分钟，安装成功
+
+
+下载并安装Pycharm社区版
+网址：https://www.jetbrains.com/pycharm/download，这里选择下图红框下载即可，下载好之后上传到linux系统，准备安装
+tar -xzf pycharm-community-2018.1.1.tar.gz          解压包 
+cd pycharm-community-2018.1.1/bin                   进入目录
+sh pycharm.sh &                                     通过运行下面的命令来运行PyCharm进入图形化安装界面
+Pycharm打开后，如果你需要导入之前安装版本的设置的话，可以选择第一个选项，
+如果没有的话，选择(Do not import settings)默认不导入设置，点击/同意，就可以进入pycharm进行配置
+激活Pycharm：在弹出的激活窗口中，选择“License serveer”输入激活服务器地址“http://127.0.0.1:1017”，之后点击‘Activate’，完成pycharm激活
+
+python编译器
+python3  进入交互式编译器    exit  退出编译器   
+Python3  文件               编译指定文件
+chmod +x 文件.py            文件获得执行权限后可直接执行编译   
+
+编写规范
+Python缩进代表在同一个代码组，一般为4个空格
+以关键字开头，冒号：结束，该行之后的一行或多行代码为代码组
+注释语句以#开头，可用\分为多行
+分号；可将多个语句分在同一行上，但这些语句不能开启代码块（不常用）
+input（）为输入函数，返回值一定是字符类型
+
+示例脚本：
+输入输出
+vim login.py                               编写以py结尾文件
+#!/usr/bin/env python3                     指定编译器
+username = input('username: ')             #使用变量username接收用户输入的字符
+print('Welcome', username)                 #输出欢迎信息，字符串和变量名之间用逗号
+                                          
