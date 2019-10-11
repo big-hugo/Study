@@ -81,13 +81,25 @@ arry = (1,"tom",2,"big")
 user = {'name':'big','age':23}
 'big' in user      //ture
 
+创建函数
+def 函数名（参数=默认值）：
+    函数体
+    return 返回值
+
 常用函数
 import 模块名          使用函数要在开头导入该函数的模块包
+当模块被直接_name == '_main_'，模块被另一文件导入时_name_ == '模块名'
 computer = random.randint(0,2)             随机在0-2之间生成数
 password = getpass.getpass('password: ')   无字符显示输入密码
 computer = random.choice(['石头', '剪刀', '布'])    电脑在列表之间选择
-for i in range(次数):                       造数工具range（）函数，这里表示10次
-
+for i in range(次数):                       造数工具range（）函数
+f1 = open（文件名，'操作'）     打开文件并进行操作，r读，w写，a追加，r+读写，w+读写，a+读写，b二进制打开
+f1.close()                     打开后要关闭文件IO
+with open(文件名, '操作') as f1:             with代码块结束后自动关闭
+data = f1.read(字节数)       读取字节到字符
+f2.write(data)               写入字符
+sys.argv[1], sys.argv[2]       表示执行文件的第一个变量和第二个变量
+String模块，其中ascii_letters是生成所有字母，从a-z和A-Z，digits是生成所有数字0-9
 
 流程语句
 if 表达式：    只要表达式数字非0即为true，空字符串、空列表、空数组、空字典为false
