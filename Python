@@ -86,6 +86,8 @@ import 模块名          使用函数要在开头导入该函数的模块包
 computer = random.randint(0,2)             随机在0-2之间生成数
 password = getpass.getpass('password: ')   无字符显示输入密码
 computer = random.choice(['石头', '剪刀', '布'])    电脑在列表之间选择
+for i in range(次数):                       造数工具range（）函数，这里表示10次
+
 
 流程语句
 if 表达式：    只要表达式数字非0即为true，空字符串、空列表、空数组、空字典为false
