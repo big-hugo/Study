@@ -60,26 +60,48 @@ Python不区分字符和字符串
     直接访问：数字
     顺序访问：字符串、列表、数组
     映射访问：字典
+
 字符串截取
 用[]和[:]能截取字符串，0是第一个索引，-1是最后一个索引
 str = ‘Python’
 str[0]值为P  str[-2]值为o  str[2:4]值为th  str[:4]值为Pyth
 print str1+''+str2  用+号可以连接输出字符串   
 print str*2         用*号可以重复输出字符串
+
 定义列表
 将列表当成数组，可保存任意数量类型的Python对象，列表也支持下标和截取操作，列表中的项目可以改变
 list = [1,"tom",2,"big"]
 使用in 或者 not in判断对象是否在列表中
 “tom” in list      //ture
-用append()可在列表后最近对象
-list.append（'three'）
+list.append（'three'）     用append()可在列表后追加一个对象
+list.count(obj)            统计对象出现次数
+list.extend(seq)            添加seq列表内容
+list.index(obj)             返回对象下标
+list.insert(index,obj)      在索引出插入对象
+list.reverse()              原地翻转列表
+list.sort()                 排序
+
 定义数组
-数组是静态的列表，一旦定义不可改变
+数组是静态的列表，一旦定义不可改变，只有一个元素时，需要末尾加上逗号，不然则认为是字符串类型
 arry = (1,"tom",2,"big")
+
 定义字典
 字典是由key-value构成映射数据类型，通过key取值，不支持下标取值
 user = {'name':'big','age':23}
-'big' in user      //ture
+user2 = dict（（['name':'big'],['age':23]））
+user3 = {}.fromkeys(('name','age'),('big','23'))        以上是定义字典的三种方式
+print 'key=%s,value=%s'%(key值，字典名[key值])           输出key和value
+print('%(key值)s'%字典名)                                根据key输出value
+字典名['key值'] = value值                                更新字典中的值，如果没有键，侧新增
+del 字典名['key值']                                      删除key值和value
+字典名.pop('key值')                                      返回key对应的value
+字典名.get('key值',default='默认值')                     返回key对应的value,没有则返回默认值
+字典名.setdefault(key,default=默认值)                    如果字典中不存在key，则创建并赋默认值
+字典名.clear()                                          清空字典
+字典名.len()                                            返回字典中value的数目
+字典名.hash(obj)                                        判断对象是否能作为key
+字典名.copy()                                            返回字典（深复制）的一个副本
+'big' in user      //ture，用in查看元素是否在字典中，not in判断是否不在
 
 创建函数
 def 函数名（参数=默认值）：
@@ -100,6 +122,7 @@ data = f1.read(字节数)       读取字节到字符
 f2.write(data)               写入字符
 sys.argv[1], sys.argv[2]       表示执行文件的第一个变量和第二个变量
 String模块，其中ascii_letters是生成所有字母，从a-z和A-Z，digits是生成所有数字0-9
+type（obj）                  查看对象类型
 
 流程语句
 if 表达式：    只要表达式数字非0即为true，空字符串、空列表、空数组、空字典为false
