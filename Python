@@ -97,11 +97,31 @@ del 字典名['key值']                                      删除key值和valu
 字典名.pop('key值')                                      返回key对应的value
 字典名.get('key值',default='默认值')                     返回key对应的value,没有则返回默认值
 字典名.setdefault(key,default=默认值)                    如果字典中不存在key，则创建并赋默认值
+字典名.items()                                          返回一个包含字典中的键值对列表
+字典名.keys（）                                          返回一个包含字典中所有键的列表
+字典名.values（）                                        返回一个包含字典中所有值得列表
+字典1.update（字典2）                                    将字典2的键值对添加到字典1
 字典名.clear()                                          清空字典
 字典名.len()                                            返回字典中value的数目
 字典名.hash(obj)                                        判断对象是否能作为key
 字典名.copy()                                            返回字典（深复制）的一个副本
 'big' in user      //ture，用in查看元素是否在字典中，not in判断是否不在
+
+创建集合
+集合对象是一组无序排序的可哈希的值，它的成员通常被称为集合元素
+集合分两种，可变集合set，不可变的集合forzenset
+集合支持in和not in操作符检查成员，用len()检查集合大小，可用for迭代集合成员，不能切片，没有键
+操作符： |并集  &交集  -差补
+集合名.add()               添加成员
+集合名.update()            批量添加成员
+集合名.remove()            移除成员
+集合1.issubset(集合2)       如果1是2的子集，返回true
+集合1.issuperset(集合2)    如果2是1的超集，返回true
+集合1.union(集合2)           返回1和2的并集
+集合1.intersection（集合2）   返回1和2的交集
+集合1.difference（集合2）     返回1的成员但不是2的成员
+
+
 
 创建函数
 def 函数名（参数=默认值）：
