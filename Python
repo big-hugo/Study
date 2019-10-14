@@ -121,6 +121,27 @@ del 字典名['key值']                                      删除key值和valu
 集合1.intersection（集合2）   返回1和2的交集
 集合1.difference（集合2）     返回1的成员但不是2的成员
 
+时间模块与方法
+时间表示从1970年00:00:00开始以秒计算偏移量
+模块 time
+struct_time数组由9个元素组成：
+索引    0        1        2         3        4       5       6                    7                         8
+属性  tm_year  tm_mon   tm_mday   tm_hour  tm_min  tm_sec  tm_wday（0-6,0是周一） tm_yday（一年第几天0-366）  tm_isdst(是否dst时间，默认-1)
+time.localtime([secs])        将一个时间戳转换为当前时区的struct_time，没给参数则以当前时间为准
+time.gmtime([secs])           将一个时间戳转换为UTC时区的struct_time
+time.time()                   返回当前时间的时间戳
+time.mktime(t)                将一个struct_time转化为时间戳
+time.sleep(secs)              线程推迟指定秒运行
+time.asctime([t])             把时间形式表示为‘Sun Jun 20 xx:xx:xx 1993’，默认参数当前时间
+time.cltime([secs])           把时间戳(按秒计算的浮点数)转化为‘Sun Jun 20 xx:xx:xx 1993’
+time.strftime('%Y-%m-%d %x',[t])    把时间转化为指定的格式，默认当前时间
+time.strptime(str[,format])         把格式字符串转化为struct_time
+模块datetime
+datetime.today()                    返回一个表示当前本地时间的datetime对象
+datetime.now([时区])                返回一个表示当前本地时间的datetime对象，如果提供时区，则获取时区对本地的时间
+datetime.strptime(str,format)       将格式字符串转为datetime对象
+datetime.ctime(datetime对象)        返回时间格式字符串
+datetime.strfime(format)            返回指定格式字符串
 
 
 创建函数
