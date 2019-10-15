@@ -35,9 +35,11 @@ Python缩进代表在同一个代码组，一般为4个空格
 input（）为输入函数，返回值一定是字符类型，print（）为输出函数
 username = input('username: ')             #使用变量username接收用户输入的字符
 print('Welcome', username)                 #输出欢迎信息，字符串和变量名之间用逗号
+print("name is %s",%username)               %s表示以字符串方式读取后面的变量
 变量赋值
 count = 0
 tuoFengYuanZe = ‘name’
+global x = 10          定义全局变量
 n += 1    等价于 n = n + 1
 n *= 2    等价于 n = n * 2
 运算符
@@ -80,6 +82,9 @@ list.index(obj)             返回对象下标
 list.insert(index,obj)      在索引出插入对象
 list.reverse()              原地翻转列表
 list.sort()                 排序
+列表解析
+核心是for循环，迭代列表的条目，返回的结果值是表达式产生的列表
+expr for 变量名 in 列表
 
 定义数组
 数组是静态的列表，一旦定义不可改变，只有一个元素时，需要末尾加上逗号，不然则认为是字符串类型
@@ -142,17 +147,93 @@ datetime.now([时区])                返回一个表示当前本地时间的dat
 datetime.strptime(str,format)       将格式字符串转为datetime对象
 datetime.ctime(datetime对象)        返回时间格式字符串
 datetime.strfime(format)            返回指定格式字符串
+时间计算timedelta
+dt = datetime.datetime.now()
+days = datetime.timedelta(days=100,hours=3)
+dt + days
+
+os模块
+对文件系统的访问大多通过os模块实现
+symlink（）       创建符号链接
+listdir（）       列出指定目录的文件
+getcwd（）        返回当前工作目录
+mkdir（"目录"）   创建目录
+chmod()           改变权限模式
+getatime（）      返回最近访问时间
+chdir（"目录"）   改变工作目录
+
+pickle模块
+写入文件时，只能以字符串形式写入，其他数据要转成字符串再写入
+用pickle可以把任何py对象写入文件，之后又可以完整取出
+file = '文件名'            指定文件名
+f = file(file,'wb')        打开文件写入
+pickle.dump(对象,f)        写入对象
+pickle.load(f)             导出对象
+f.close()                  关闭文件
+
+异常处理
+首先是引起异常发生的错误，然后是检测（和采取可能的措施）阶段
+定义了进行异常监控的一段代码，并且提供了处理异常的机制
+NameError 未声明对象  IndexError 序列中没有此索引  SyntaxError 语法错误
+KeyboardInterrupt 用户中断执行  KeyboardInterrupt 用户中断执行
+EOFError 没有内建输入，到达EOF标记   IOError 输入输出操作失败  
+try-except语句
+try：
+    正常代码块
+except 异常名称[as e]：          e为异常参数，触发后传给异常处理器，可用来输出异常信息
+    报错执行语句                  print（e）
+except 异常名称2[as e]：
+    ······
+else：
+    执行代码块                   try执行成功没异常后，执行else内的语句
+finally：
+    执行代码块                   无论是否触发异常，都会执行
+raise语句
+raise 异常名称("报错信息")        raise语句能强行触发异常  
+assert 表达式,'报错信息'          断言异常，若为真执行下面代码，若为假执行报错信息
 
 
 创建函数
 def 函数名（参数=默认值）：
     函数体
     return 返回值
+匿名函数
+匿名函数不用def来声明，用lambda
+格式：    lambda [参数···]：表达式
+     a = lambda [x,y]:x+y        定义匿名函数
+     print(a(3,4))               使用匿名函数
+filter()函数
+filter(布尔函数，列表)，调用布尔函数来迭代列表中的元素，返回一个使布尔函数返回值为true的列表
+data = filter(lambda x:x % 2),[a for a in range(10)])  x来自遍历后面的10列表
+print(list(data))   过滤出10以内的奇数
+map()函数
+map(函数，列表)，调用函数来迭代列表中的元素，返回经过函数处理的值
+data = map(lambdax:x*2,[a for a in range(10)])     返回列表每个数值*2
+递归函数
+函数包含了自身的调用称为递归函数
+生成器
+生成器是带yield语句的函数，能用next()返回下一个结果，当下个一为return或者没有的时候，StopIteration异常
+def gen():
+    yield '1'
+    yield 'two'
+mygen = gen()
+mygen.next()      返回1
+mygen.next()      返回two
+mygen.next()      抛出Stoplteration异常
 
-常用函数
-import 模块名          使用函数要在开头导入该函数的模块包
+模块
+当代码量很大时，把代码分成模块来调用，模块的文件名就是模块的名字加.py
+模块的导入需要一个路径搜索的过程，py在预定义区域中查找要调用的模块
+import sys
+print(sys.path)       查看预定义区域
+常用模块函数
+import 模块名1，模块名2···       使用函数要在开头导入该函数的模块包
+from 函数名 import 模块名        也可以只导入模块的属性
+import 模块名 as 别名            也可以为模块起别名
 当模块被直接_name == '_main_'，模块被另一文件导入时_name_ == '模块名'
-computer = random.randint(0,2)             随机在0-2之间生成数
+hashlib模块提供hash算法
+tarfile模块允许创建、访问tar文件
+computer = random.randint(0,2)             随机在0-2之间生成数，random模块
 password = getpass.getpass('password: ')   无字符显示输入密码
 computer = random.choice(['石头', '剪刀', '布'])    电脑在列表之间选择
 for i in range(次数):                       造数工具range（）函数
@@ -189,9 +270,7 @@ for 表达式：         for循环语句，一般用于确定次数的循环
 else：              for可搭配else使用
     代码组  
     
-列表解析
-核心是for循环，迭代列表的条目，返回的结果值是表达式产生的列表
-expr for 变量名 in 列表
+
 
 
 
