@@ -52,7 +52,7 @@ chkconfig  httpd  off/on    RHEL6系统服务操作命令
 systemctl  enable/disable  httpd    RHEL7系统服务操作命令
 锁定/解锁保护文件(root用户同样受到限制)
 EXT3/EXT4的文件属性控制  属性i:不可变  属性a:仅可追加
-chatte  +a   文件     设置对文件属性(+-=可用)
+chattr  +a   文件     设置对文件属性(+-=可用)
 lsattr [-l]  文件     查看文件属性
 
 selinux
