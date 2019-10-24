@@ -12,7 +12,7 @@ validate_password_length=6
 
 
 数据库基本管理
-mysql [-h服务器IP或域名  -u用户名   -p密码  -P端口  数据库名称]    连接MySQL数据库的命令语法格式
+mysql [-h服务器IP或域名  -u用户名   -p密码  -P端口 -e 'sql语句;'  数据库名称]    连接MySQL数据库的命令语法格式
 mysqladmin -u用户 -p旧密码 password'新密码'              修改密码
 show database;           查看数据库
 use 库名;                 切换数据库
