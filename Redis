@@ -10,8 +10,10 @@ cd redis-4.0.8                        进入解压后目录
 make && make install                  编译安装
 ./utils/install_server.sh             执行初始化脚本,启动redis(一路回车)
 /etc/init.d/redis_6379 stop           停止服务(start开启)
-redis-cli                             连接本机redis服务
+redis-cli  [-h IP] [-p 端口]          连接本机redis服务
+AUTH   密码                           输入用户密码
 /var/lib/redis/6379/                  库文件存放目录
+
 
 redis基本操作(key-values存储结构)
 keys *              查看所有变量名(*匹配任意多个字符  ?匹配单个字符)
@@ -37,6 +39,7 @@ lindex  变量  位置       返回lindex中位置的值        lset    变量  
 hset   变量  列名  值... 定义hash变量(hmset定义多个)    hget    变量  列    获取hash对面列的值(hmget取多个)
 hgetall  变量           返回hash表中所有列名和值      hvals   变量       返回hash表中所有值
 hdel   变量   列        删除hash表中的列
+flushall     清除缓存
 
 配置文件解析
 vim /etc/redis/6379.conf
