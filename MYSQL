@@ -151,7 +151,8 @@ where  between 10 and 20                          在10到20之间
 where  值 like '表达式'    模糊查询     _单个字符  %任意个字符
 where  值 regexp  '正则表达式式'       ^开头  $结尾  .任意单个字符  *前个字符匹配多次  |或  []匹配范围内
 select distinct 值        去重查询
-order by 字段 desc | asc  查询结果降序|升序排序
+order by 字段             根据指定的列对结果集进行排序
+desc | asc  查询结果降序|升序排序
 group by 字段             分组查询
 having  条件              查询结果过滤
 limit   3 ;               显示前三行
