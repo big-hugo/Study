@@ -20,6 +20,7 @@ createrepo   rpm包目录     生成仓库数据文件,在包目录下,文件名
 createrepo  [--update] rpm包目录     更新仓库数据文件
 
 rpm软件
+rpm -qa   查看所有rpm包
 rpm -ivh 软件  安装软件
 rpm -e  包名   卸载软件
 rpm -ql 包名   查看软件包是否下载
