@@ -57,9 +57,16 @@ IPADDR="192.168.1.50"       IP地址
 NETMASK="255.255.255.0"     子网掩码
 GATEWAY="192.168.1.254"     默认网关
 systemctl restart network   重启网络服务
+ifconfig 网卡名 0 0          清空IP地址分配
 方法2:nmcli connection modify '网卡名' ipv4.method manual ipv4.addresses 'IP/掩码 网关' ipv4.dns dns connection.autoconnect yes    永久配置IP(redhat7.0以上支持)
 nmcli connection up '网卡名'       激活网卡
 方法3:nmtui                 图形界面配置IP
+方法4：ifconfig eth0 172.16.1.100 netmask 255.255.255.255 broadcast 172.16.1.255 up   配置临时IP
+
+Windows添加路由
+route -p add 网段 mask 255.255.255.128 网关
+linux添加路由
+route add -net 通向网段 netmask 255.255.255.0 gw 网关 dev 设备
 
 linux链路聚合配置(又名:聚合链路 网卡绑定)
 提高网卡设备的可靠性,提高冗余
