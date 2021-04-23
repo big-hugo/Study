@@ -52,6 +52,11 @@ resize2fs   逻辑卷路径                   扩大逻辑卷ext4文件系统
 vgextend  卷组名  设备路径                 扩大卷组容量
 逻辑卷ext4支持缩减,xfs不支持缩减
 
+dd命令详解
+https://www.cnblogs.com/yuanqiangfei/p/9138625.html
+销毁磁盘数据
+dd if=/dev/urandom of=/dev/hda1
+
 swap交换空间
 当真实物理内存不够用时,会启用交换空间,将不常用的内存数据暂时放入交换空间中,缓解内存不足
 parted/fdisk   设备              划分分区
